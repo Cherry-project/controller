@@ -94,7 +94,7 @@ public class LaunchPresentation {
 				}
 				// set the new one 
 				try {
-					HttpURLConnectionExample.sendPost("http://52.50.54.27/WS_video.php","name=" + list_img.get(i) + ".PNG");
+					HttpURLConnectionExample.sendPost("http://52.50.54.27/WS_video.php","name=" + list_img.get(i));
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					System.out.println("\n Erreur" + e);
