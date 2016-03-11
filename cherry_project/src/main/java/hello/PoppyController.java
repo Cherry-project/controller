@@ -19,9 +19,8 @@ public class PoppyController {
 		String info = new String();
 		System.out.println("\n name: " + name);
 		
-		
 		// PLay presentation
-		if(name.equals("Sogeti") ){
+		if( name.toLowerCase().indexOf("sogeti")!= -1){
 			info = "Play Sogeti";
 			
 			
@@ -38,7 +37,7 @@ public class PoppyController {
 			
 		}
 		
-		else if(name.equals("Mairie")){
+		else if( name.toLowerCase().indexOf("mairie") != -1){
 			info = "Play Mairie";
 			
    			String excelFilePath = "D:/utilisateurs/jguichar/cherry_project_2/Resources/Prima.xlsx";
@@ -53,7 +52,7 @@ public class PoppyController {
    				}
 			
 		}
-		else if(name.equals("Prima")){
+		else if(name.toLowerCase().indexOf("prima") != -1 ){
 			info = "Play Prima";
 
 			String excelFilePath = "D:/utilisateurs/jguichar/cherry_project_2/Resources/Prima.xlsx";
@@ -67,11 +66,21 @@ public class PoppyController {
 				System.out.println("\n Erreur" + e);
 				}
 		}
+		else if( name.toLowerCase().indexOf("bonjour") != -1 ){
+			info = "Play Bonjour";
+			LaunchPrimitive.playBehaviorPrimitive("double_me_behave");
+			
+			LaunchPrimitive.playSpeakPrimitive("Bonjour, je m'appelle Cherry.");
+			
+			
+		}
 		else{
 			info = "Nom inconnu";
-			LaunchPrimitive.playSpeakPrimitive("Je n'ai pas compris");
+			LaunchPrimitive.playBehaviorPrimitive("hunkers_behave");
+
+			LaunchPrimitive.playSpeakPrimitive("Je n'ai pas compris ce que vous avez dit. Veuillez répéter.");
 			
-			
+
 		}
 			
     		
