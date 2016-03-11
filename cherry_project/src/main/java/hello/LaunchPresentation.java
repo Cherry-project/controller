@@ -85,20 +85,22 @@ public class LaunchPresentation {
   				if (list_img.get(i-1) != "Start"){
 					
   					try {
-						HttpURLConnectionExample.sendPost("http://52.50.54.27/WS_video.php","name=" + list_img.get(i-1) + "&owner=admin_off");
-					} catch (IOException e) {
+						HttpURLConnectionExample.sendGet("http://52.50.54.27/WS_video.php?name=" + list_img.get(i-1) + "&owner=admin_off");
+					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						System.out.println("\n Erreur" + e);
 						e.printStackTrace();
+						Thread.sleep(5000);
 					}
 				}
 				// set the new one 
 				try {
-					HttpURLConnectionExample.sendPost("http://52.50.54.27/WS_video.php","name=" + list_img.get(i));
-				} catch (IOException e) {
+					HttpURLConnectionExample.sendGet("http://52.50.54.27/WS_video.php?name=" + list_img.get(i));
+				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					System.out.println("\n Erreur" + e);
 					e.printStackTrace();
+					Thread.sleep(5000);
 				}
 
 			}
@@ -112,7 +114,16 @@ public class LaunchPresentation {
 				
 			
 		}
-		// TODO Auto-generated method stub
+		
+		try {
+			System.out.println("\n afficher list" + list.get(list.size()-1));
+			HttpURLConnectionExample.sendGet("http://52.50.54.27/WS_video.php?name="  + list_img.get(list.size()-1) +"&owner=admin_off");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println("\n Erreur" + e);
+			e.printStackTrace();
+			Thread.sleep(5000);
+		}	// TODO Auto-generated method stub
 
 	}
 
