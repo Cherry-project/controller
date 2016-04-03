@@ -5,8 +5,30 @@ import java.util.ArrayList;
 
 public class LaunchPresentation {
 
+	private static String url_to_website= PoppyController.url_to_website;
+	private static int stop = 0; 
+	
 	public static void start( String excelFilePath) throws InterruptedException, IOException {
 		
+		
+		// Go into presentation state => enable stop while speaking
+		LaunchPrimitive.setListenStateParameter("presentation");
+		
+		// Start Listen Primitive
+		//LaunchPrimitive.ListenPrimitive();
+		
+		// Stop head, start torso if not done
+		/*String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
+		
+		int index_torso = current_primitive.indexOf("torso_idle_motion");
+		int index_head = current_primitive.indexOf("head_idle_motion");
+		
+		if(index_torso == -1){
+			LaunchPrimitive.playBehaviorPrimitive("torso_idle_motion");
+		}
+		if(index_head != -1){
+			LaunchPrimitive.stopPrimitive("head_idle_motion");
+		}*/
 		
 		
 		// Declare Arrays
@@ -35,7 +57,6 @@ public class LaunchPresentation {
 		System.out.println("\nList of " + "Text: " + list_text );
 		
 		//Get list of picture to display
-		
 		try {
 			list_img = SimpleExcelReaderExample.getExcelField(excelFilePath,"Slide");
 		} catch (IOException e1) {
@@ -44,13 +65,36 @@ public class LaunchPresentation {
 		}
 		list_img.add(0,"Start");
 		System.out.println("\nList of " + "diapo: " + list_img );
-	
+		
+		play(list,list_text,list_img);
+	}
+		// Play presentation
+	public static void play(ArrayList<String> list, ArrayList<String> list_text, ArrayList<String> list_img ) throws InterruptedException, IOException {
 		
 		int index_behave = -1;
 		int index_speak = -1;
+		int index_img = -1;
+		
+		// Stop head, start torso if not done
+		String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
+		
+		int index_torso = current_primitive.indexOf("torso_idle_motion");
+		int index_head = current_primitive.indexOf("head_idle_motion");
+		
+		if(index_torso == -1){
+			LaunchPrimitive.playBehaviorPrimitive("torso_idle_motion");
+		}
+		if(index_head != -1){
+			LaunchPrimitive.stopPrimitive("head_idle_motion");
+		}
 		
 		for(int i=1; i< list.size(); i++){
 			
+			if (stop == 1){
+				LaunchPrimitive.playSpeakPrimitive("D'accord, j'arr\u00eate la pr\u00e9sentation");
+				LaunchPrimitive.playBehaviorPrimitive("rest_open_behave");
+				break;
+			}
 			// Check currently running primitive
 			String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
 			System.out.println("\nStr " + current_primitive );
@@ -61,7 +105,8 @@ public class LaunchPresentation {
 			System.out.println("\nIndex: " + index_behave +"of :" + list.get(i-1) + " speak: " + index_speak);
 			
 			// Check wether speak or behave are still running
-			while( index_speak != -1 && index_behave != -1)
+			//while( index_speak != -1 && index_behave != -1)
+			while(index_behave != -1)
 			{
 				Thread.sleep(1000);
 				
@@ -84,27 +129,34 @@ public class LaunchPresentation {
 				// Shut down previous img (exept "start)
   				if (list_img.get(i-1) != "Start"){
 					
-  					try {
-						HttpURLConnectionExample.sendGet("http://52.50.54.27/WS_video.php?name=" + list_img.get(i-1) + "&owner=admin_off");
+  					ToWebsite.deletePicture(list_img.get(i-1));
+  					/*try {
+						HttpURLConnectionExample.sendGet( url_to_website + "/WS_video.php?name=" + list_img.get(i-1) + "&owner=admin_off");
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						System.out.println("\n Erreur" + e);
 						e.printStackTrace();
-						Thread.sleep(5000);
-					}
+					}*/
 				}
-				// set the new one 
-				try {
-					HttpURLConnectionExample.sendGet("http://52.50.54.27/WS_video.php?name=" + list_img.get(i));
+				// set the new one
+  				index_img = i;
+  				ToWebsite.displayPicture(list_img.get(index_img));
+  				
+  				/*try {
+					
+					HttpURLConnectionExample.sendGet(url_to_website + "/WS_video.php?name=" + list_img.get(index_img));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					System.out.println("\n Erreur" + e);
 					e.printStackTrace();
-					Thread.sleep(5000);
-				}
+				}*/
+				Thread.sleep(1000);
 
 			}
+			
 			// text
+			//LaunchPrimitive.playSpeakPrimitive(list_text.get(i));
+			String i_str = Integer.toString(i);
 			LaunchPrimitive.playSpeakPrimitive(list_text.get(i));
 			System.out.println("\n Speak: " + list_text.get(i));
 			
@@ -115,16 +167,38 @@ public class LaunchPresentation {
 			
 		}
 		
-		try {
-			System.out.println("\n afficher list" + list.get(list.size()-1));
-			HttpURLConnectionExample.sendGet("http://52.50.54.27/WS_video.php?name="  + list_img.get(list.size()-1) +"&owner=admin_off");
+		Thread.sleep(5000);
+		// Kill the last diapo
+		ToWebsite.deletePicture(list_img.get(index_img));
+		
+		/*
+		 try {
+			HttpURLConnectionExample.sendGet(url_to_website + "/WS_video.php?name="  + list_img.get(index_img) +"&owner=admin_off");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println("\n Erreur" + e);
 			e.printStackTrace();
-			Thread.sleep(5000);
 		}	// TODO Auto-generated method stub
+		*/
+		LaunchPrimitive.stopPrimitive("torso_idle_motion");
+		System.out.println("\n Stop behavior: " + "torso_idle_motion");
+		
+		
+		// Go into normal state => disable stop while speaking
+		LaunchPrimitive.setListenStateParameter("normal");
+		
+		// Set stop to 0
+		stop = 0;
+		
+		// Back to listen
+		LaunchPrimitive.ListenPrimitive();
 
 	}
-
+	public static void stop() throws InterruptedException, IOException {
+		
+		stop = 1;
+		System.out.println("\n Set stop to 1");
+		LaunchPrimitive.setListenStateParameter("normal");
+		
+	}
 }

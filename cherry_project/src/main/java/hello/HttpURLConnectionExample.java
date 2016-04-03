@@ -8,7 +8,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-//import javax.net.ssl.HttpsURLConnection;
 
 public class HttpURLConnectionExample {
 
@@ -23,12 +22,13 @@ public class HttpURLConnectionExample {
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
+			
 			// optional default is GET
 			con.setRequestMethod("GET");
 
 			//add request header
 			con.setRequestProperty("User-Agent", USER_AGENT);
-
+			
 			int responseCode = con.getResponseCode();
 			System.out.println("\nSending 'GET' request to URL : " + url);
 			System.out.println("Response Code : " + responseCode);
