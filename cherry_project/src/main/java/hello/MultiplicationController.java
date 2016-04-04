@@ -35,12 +35,6 @@ public class MultiplicationController {
 		if( a_str.equals("null")){
 			multi.playRandomMultiplication(multi);
 			info = "Play Random multiplication";
-			try{
-				Thread.sleep(1);
-			}
-			catch (InterruptedException e){
-				info = "Play Random multiplication";
-			}
 
 		}
 		// trigger a multi 
@@ -86,6 +80,7 @@ public class MultiplicationController {
 		if ( response ==  multi.getResult())
 		{
 			LaunchPrimitive.playSpeakPrimitive("Tu as donn\u00E9 la bonne r\u00E9ponse!");
+			LaunchPrimitive.playBehaviorPrimitive("rest_open_behave");
 			//System.out.println("\n Tu as bien r\u00E9pondu gamin!");
 			
 			// Reset to 0
@@ -104,7 +99,7 @@ public class MultiplicationController {
 		}
 		else if ( response !=  multi.getResult() && multi.getAlready_Done() == 2)
 		{
-			LaunchPrimitive.playSpeakPrimitive("Ce n'est toujours pas la bonne r\u00E9ponse, la bonne r\u00E9ponse est" + multi.getResult() );
+			LaunchPrimitive.playSpeakPrimitive("Ce n'est toujours pas la bonne r\u00E9ponse, la bonne r\u00E9ponse est " + multi.getResult() );
 			//System.out.println("\n Deux fois faux, ca fait beaucoup gamin! La r\u00E9ponse est " + multi.getResult());
 			
 			// Reset to 0

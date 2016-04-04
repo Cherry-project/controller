@@ -33,10 +33,9 @@ public class ListenerController {
     		if(index_torso == -1){
     			LaunchPrimitive.playBehaviorPrimitive("torso_idle_motion");
     		}
-    		if(index_head == -1){
+    		/*if(index_head == -1){
     			LaunchPrimitive.playBehaviorPrimitive("head_idle_motion");
-    		}
-			//protéger le lancement des primitives de mouvement!
+    		}*/
 			
 			System.out.println("\n Play waiting behaviors");
 			
@@ -111,9 +110,9 @@ public class ListenerController {
     		if(index_torso == -1){
     			LaunchPrimitive.playBehaviorPrimitive("torso_idle_motion");
     		}
-    		if(index_head == -1){
+    		/*if(index_head == -1){
     			LaunchPrimitive.playBehaviorPrimitive("head_idle_motion");
-    		}
+    		}*/
 			
 			System.out.println("\n Je joue un wait au pif");
 		

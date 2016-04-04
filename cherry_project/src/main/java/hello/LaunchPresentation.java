@@ -10,9 +10,12 @@ public class LaunchPresentation {
 	
 	public static void start( String excelFilePath) throws InterruptedException, IOException {
 		
+		// Listen signal "off"
+		ToWebsite.setListeningSignal("off");
 		
 		// Go into presentation state => enable stop while speaking
-		LaunchPrimitive.setListenStateParameter("presentation");
+		//LaunchPrimitive.setListenStateParameter("presentation");
+		
 		
 		// Start Listen Primitive
 		//LaunchPrimitive.ListenPrimitive();
@@ -93,10 +96,12 @@ public class LaunchPresentation {
 			if (stop == 1){
 				LaunchPrimitive.playSpeakPrimitive("D'accord, j'arr\u00eate la pr\u00e9sentation");
 				LaunchPrimitive.playBehaviorPrimitive("rest_open_behave");
+				stop = 0;
 				break;
 			}
 			// Check currently running primitive
-			String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
+			 
+			current_primitive = LaunchPrimitive.getRunningPrimitiveList();
 			System.out.println("\nStr " + current_primitive );
 			
 			index_behave = current_primitive.indexOf(list.get(i-1));
@@ -131,7 +136,7 @@ public class LaunchPresentation {
 					
   					ToWebsite.deletePicture(list_img.get(i-1));
   					/*try {
-						HttpURLConnectionExample.sendGet( url_to_website + "/WS_video.php?name=" + list_img.get(i-1) + "&owner=admin_off");
+						HttpURLConnectionExample.sendGet( url_to_website + "/PhpProject_test/WS_video.php?name=" + list_img.get(i-1) + "&owner=admin_off");
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						System.out.println("\n Erreur" + e);
@@ -144,7 +149,8 @@ public class LaunchPresentation {
   				
   				/*try {
 					
-					HttpURLConnectionExample.sendGet(url_to_website + "/WS_video.php?name=" + list_img.get(index_img));
+					HttpURLConnectionExample.sendGet(url_to_website + "/PhpProject_test/WS_video.php?name=" + list_img.get(index_img));
+					System.out.println("\n" + url_to_website + "/PhpProject_test/WS_video.php?name=" + list_img.get(index_img));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					System.out.println("\n Erreur" + e);
@@ -167,7 +173,7 @@ public class LaunchPresentation {
 			
 		}
 		
-		Thread.sleep(5000);
+		Thread.sleep(4000);
 		// Kill the last diapo
 		ToWebsite.deletePicture(list_img.get(index_img));
 		

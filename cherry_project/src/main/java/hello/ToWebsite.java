@@ -8,7 +8,7 @@ public class ToWebsite {
 	public static void displayPicture(String picture_name){
 		
 		try {
-			HttpURLConnectionExample.sendGet(url_to_website + "/WS_video.php?name=" + picture_name);
+			HttpURLConnectionExample.sendGet(url_to_website + "/PhpProject_test/WS_video.php?name=" + picture_name);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -19,7 +19,7 @@ public class ToWebsite {
 	public static void deletePicture(String picture_name){
 		
 		try {
-			HttpURLConnectionExample.sendGet(url_to_website + "/WS_video.php?name=" + picture_name + "&owner=admin_off");
+			HttpURLConnectionExample.sendGet(url_to_website + "/PhpProject_test/WS_video.php?name=" + picture_name + "&owner=admin_off");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
