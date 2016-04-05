@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PoppyController {
 	
-	public static String url_to_robot = "http://127.0.0.2:8888";
-	//public static String url_to_robot = "http://192.168.1.103:8080";
-	public static String url_to_website = "http://52.50.54.27";
+	//public static String url_to_robot = "http://127.0.0.2:8888";
+	public static String url_to_robot = "http://192.168.1.106:8080";
+	//public static String url_to_website = "http://52.50.54.27";
+	public static String url_to_website = "http://192.168.1.101";
     
 	@RequestMapping("/poppy")
 	public Poppy poppy(@RequestParam(value="name", defaultValue="World") String name) {
@@ -68,15 +69,42 @@ public class PoppyController {
 		}
 		else if( name.toLowerCase().indexOf("bonjour") != -1 ){
 			info = "Play Bonjour";
+			ToWebsite.setListeningSignal("off");
 			LaunchPrimitive.playBehaviorPrimitive("double_me_behave");
-			LaunchPrimitive.playSpeakPrimitive("Bonjour, je m'appelle Cherry.");	
+			LaunchPrimitive.playSpeakPrimitive("Bonjour, je m'appelle Tcherry.");
+			
+			
+			
+			LaunchPrimitive.playSpeakPrimitive("Bienvenu, \u00e0 la semaine digitale");
+			LaunchPrimitive.playBehaviorPrimitive("rest_open_behave");
+		
 			
 			LaunchPrimitive.ListenPrimitive();
 		}
+		
+		else if( name.toLowerCase().indexOf("aurevoir") != -1 ){
+			info = "Play Au revoir";
+			ToWebsite.setListeningSignal("off");
+			LaunchPrimitive.playBehaviorPrimitive("left_arm_up_behave");
+			LaunchPrimitive.playSpeakPrimitive("Merci d'\u00eatre pass\u00E9 me voir");
+			
+			
+			LaunchPrimitive.playSpeakPrimitive("Je te souhaite une bonne visite");
+			LaunchPrimitive.playBehaviorPrimitive("rest_open_behave");
+
+			
+			LaunchPrimitive.ListenPrimitive();
+		}
+		
 		else{
 			info = "Nom inconnu";
+			ToWebsite.setListeningSignal("off");
 			LaunchPrimitive.playBehaviorPrimitive("hunkers_behave");
 			LaunchPrimitive.playSpeakPrimitive("Je n'ai pas compris ce que vous avez dit.");
+			
+			//LaunchPrimitive.playBehaviorPrimitive("left_arm_up_behave");
+			LaunchPrimitive.playSpeakPrimitive("Veuillez r\u00E9p\u00E9ter");
+			LaunchPrimitive.playBehaviorPrimitive("rest_open_behave");
 			
 			LaunchPrimitive.ListenPrimitive();
 		}

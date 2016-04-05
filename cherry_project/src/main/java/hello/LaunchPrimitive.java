@@ -36,8 +36,35 @@ public class LaunchPrimitive {
 		
 		String primitive = "speak";
     	String property = "sentence_to_speak";
+    	int index_speak;
     	
     	String str = "\"" + txtString + "\"";
+    	
+    	do {
+			try{
+				Thread.sleep(500);
+			}
+			catch(Exception e){
+				System.out.println("\nErreur " +e);
+			}
+    		
+			/////////////////////////////////////////////
+			
+			/*try {
+				current_primitive = HttpURLConnectionExample.sendGet(url_to_robot + "/primitive/running/list.json");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
+			
+			String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
+    		////////////////////////////////////////////
+    		
+    		index_speak = current_primitive.indexOf("speak");
+    		System.out.println("\n			Primitive: " + current_primitive );
+    		System.out.println("\n			Wait for speak to stop... ");
+    	}
+    	while( index_speak != -1 );
     
     	// Start Primitive
 
@@ -64,7 +91,7 @@ public class LaunchPrimitive {
     	// wait until speak is running  	
     	int index_speak;
     	int index_listen;
-		
+		String current_primitive  = new String();
     	// wait for end of speak if not in presentation state
 		if(is_state == -1){
 			do {
@@ -74,7 +101,19 @@ public class LaunchPrimitive {
 				catch(Exception e){
 					System.out.println("\nErreur " +e);
 				}
-	    		String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
+	    		
+				/////////////////////////////////////////////
+				
+				/*try {
+					current_primitive = HttpURLConnectionExample.sendGet(url_to_robot + "/primitive/running/list.json");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}*/
+				
+				current_primitive = LaunchPrimitive.getRunningPrimitiveList();
+	    		////////////////////////////////////////////
+	    		
 	    		index_speak = current_primitive.indexOf("speak");
 	    		System.out.println("\n			Primitive: " + current_primitive );
 	    		System.out.println("\n			Wait for speak to stop... ");
@@ -88,7 +127,7 @@ public class LaunchPrimitive {
 		//LaunchPrimitive.playBehaviorPrimitive("listen");
 		
 		try {
-			HttpURLConnectionExample.sendGet(url_to_robot + "/primitive/" + property + "/start.json");
+			HttpURLConnectionExample.sendGet("http://127.0.0.2:8888" + "/primitive/" + property + "/start.json");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -102,8 +141,9 @@ public class LaunchPrimitive {
 			catch(Exception e){
 				System.out.println("\nErreur " +e);
 			}
-    		String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
-    		index_listen = current_primitive.indexOf("listen");
+    		//String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
+    		
+			index_listen = current_primitive.indexOf("listen");
     		System.out.println("\n			Primitive: " + current_primitive );
     		System.out.println("\n			Wait for listen..." );
     	}
@@ -125,6 +165,7 @@ public class LaunchPrimitive {
 		}*/
 		
     	System.out.println("\n Listen finished");
+    	ToWebsite.setListeningSignal("off");
 	}
 	
 	public static String getRunningPrimitiveList(){
@@ -152,7 +193,7 @@ public class LaunchPrimitive {
     	// Start Primitive
 
 		try {
-			listen_state = HttpURLConnectionExample.sendGet(url_to_robot + "/primitive/" + primitive + "/property/" + property);
+			listen_state = HttpURLConnectionExample.sendGet("http://127.0.0.2:8888" + "/primitive/" + primitive + "/property/" + property);
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -173,7 +214,7 @@ public class LaunchPrimitive {
     	// Start Primitive
 
 		try {
-			HttpURLConnectionExample.sendPost(url_to_robot + "/primitive/" + primitive + "/property/" + property +"/value.json", str);
+			HttpURLConnectionExample.sendPost("http://127.0.0.2:8888" + "/primitive/" + primitive + "/property/" + property +"/value.json", str);
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
