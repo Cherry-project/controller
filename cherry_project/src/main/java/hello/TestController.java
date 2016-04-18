@@ -22,8 +22,7 @@ public class TestController {
 			
 		    LaunchPrimitive.playBehaviorPrimitive(a_str);
 		    
-		    return new Poppy(info);
-		    
+		    return new Poppy(info);  
 	    }
 	
 }

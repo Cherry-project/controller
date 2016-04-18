@@ -11,7 +11,7 @@ public class TextReader {
 	
 	public static ArrayList<String> getLines(String filePath) throws FileNotFoundException, IOException {
 	
-		ArrayList lines = new ArrayList();
+		ArrayList<String> lines = new ArrayList<String>();
 		
 		try
 		{
