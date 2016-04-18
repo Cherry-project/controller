@@ -49,12 +49,16 @@ public class JsonRetriever {
 
 		  StringBuffer jb = new StringBuffer();
 		  String line = null;
-		  
+		  String info = new String();
+		
 		  try {
 		    BufferedReader reader = request.getReader();
 		    while ((line = reader.readLine()) != null)
 		      jb.append(line);
-		  } catch (Exception e) { logger.error("Can't read the request", e);}
+		  } catch (Exception e) { 
+			  logger.error("Can't read the request", e);
+			  info  = "Can't read request";
+		  }
 		  
 		  System.out.println("\n1		" + jb.toString());
 		  
@@ -62,15 +66,24 @@ public class JsonRetriever {
 		  /*response.setContentType("text/html");
 		  response.setStatus(HttpServletResponse.SC_OK);
 		  response.getOutputStream();*/
+		  JSONObject my_json = new JSONObject();
 		  
-		  JSONObject my_json =new JSONObject(jb.toString());
-		  
+		  try{
+			  my_json =new JSONObject((jb.toString()));
+		  }
+		  catch(Exception e){
+			  logger.error("It's not a JSON", e);
+			  info  = "Not a Json";
+			  return new Poppy(info);
+			  }
 		  
 		  try{
 			  logger.info("Play presentation from Website");
+			  info  = "Play presentation";
 			  LaunchPresentation.playFromJson(my_json);
 		  }
 		  catch(Exception e){
+			  info  = "Exception raised when attempting to play presentation";
 			  logger.error("Exception raised when attempting to play presentation from WebSite", e);
 		  }
 		  //} catch (Exception e) {
@@ -191,7 +204,6 @@ public class JsonRetriever {
 		//JSONObject json = (JSONObject) parser.parse(my_json);
 		
 		
-		String info = new String();
 		
 		//JSONObject json = readJsonFromUrl(requestURL.toString());
 	    //System.out.println(json.toString());
@@ -201,7 +213,7 @@ public class JsonRetriever {
 		//String inputString = param;
 		
 
-		return new Poppy("Json handler");
+		return new Poppy(info);
 	}
 }
 	
