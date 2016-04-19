@@ -1,13 +1,15 @@
-package hello;
+package cherry.crmhandlers.web;
 
 // REST
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-// JSON
-import org.json.JSONException;
+
+import cherry.crmhandlers.service.Users;
+import cherry.gamehandlers.service.ToWebsite;
+import cherry.robothandlers.service.Poppy;
+
 import org.json.JSONObject;
-import org.json.JSONArray;
 // LOG
 import org.apache.log4j.Logger;
 
@@ -20,11 +22,11 @@ public class UsersController {
 	private static Logger logger = Logger.getLogger(UsersController.class);
 	
 	@RequestMapping("/define")
-	public void setNewUser(@RequestParam(value="adress", required = false, defaultValue = "null") String a_str) {
+	public Poppy setNewUser(@RequestParam(value="adress", required = false, defaultValue = "null") String a_str) {
 	
 		Users current_user = new Users();
 		System.out.println("\nBonjour " + a_str);
-		
+		String info = new String();
 				
 
 		current_user.setEmail(a_str);
@@ -68,7 +70,10 @@ public class UsersController {
 		current_user.setContent_title(title_list);
 		current_user.setContent(json_list);
 		
+		info = "Content for user " + current_user.getEmail() + " retrieved";
 		logger.info("Content for user " + current_user.getEmail() + " retrieved");
+		
+		return new Poppy(info);
 	}
 
 }

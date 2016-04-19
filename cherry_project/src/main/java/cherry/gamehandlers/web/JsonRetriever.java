@@ -1,41 +1,18 @@
-package hello;
-
-import java.util.ArrayList;
-import java.util.Map;
+package cherry.gamehandlers.web;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
-import java.text.ParseException;
-import java.io.FileInputStream;
-import java.io.UnsupportedEncodingException;
-
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMethod;
 
-import org.json.JSONException;
+import cherry.robothandlers.service.LaunchPresentation;
+import cherry.robothandlers.service.Poppy;
+
 import org.json.JSONObject;
-import org.json.JSONArray;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.core.MediaType;
 //LOG
 import org.apache.log4j.Logger;
 
@@ -49,12 +26,16 @@ public class JsonRetriever {
 
 		  StringBuffer jb = new StringBuffer();
 		  String line = null;
-		  
+		  String info = new String();
+		
 		  try {
 		    BufferedReader reader = request.getReader();
 		    while ((line = reader.readLine()) != null)
 		      jb.append(line);
-		  } catch (Exception e) { logger.error("Can't read the request", e);}
+		  } catch (Exception e) { 
+			  logger.error("Can't read the request", e);
+			  info  = "Can't read request";
+		  }
 		  
 		  System.out.println("\n1		" + jb.toString());
 		  
@@ -62,15 +43,24 @@ public class JsonRetriever {
 		  /*response.setContentType("text/html");
 		  response.setStatus(HttpServletResponse.SC_OK);
 		  response.getOutputStream();*/
+		  JSONObject my_json = new JSONObject();
 		  
-		  JSONObject my_json =new JSONObject(jb.toString());
-		  
+		  try{
+			  my_json =new JSONObject((jb.toString()));
+		  }
+		  catch(Exception e){
+			  logger.error("It's not a JSON", e);
+			  info  = "Not a Json";
+			  return new Poppy(info);
+			  }
 		  
 		  try{
 			  logger.info("Play presentation from Website");
+			  info  = "Play presentation";
 			  LaunchPresentation.playFromJson(my_json);
 		  }
 		  catch(Exception e){
+			  info  = "Exception raised when attempting to play presentation";
 			  logger.error("Exception raised when attempting to play presentation from WebSite", e);
 		  }
 		  //} catch (Exception e) {
@@ -191,7 +181,6 @@ public class JsonRetriever {
 		//JSONObject json = (JSONObject) parser.parse(my_json);
 		
 		
-		String info = new String();
 		
 		//JSONObject json = readJsonFromUrl(requestURL.toString());
 	    //System.out.println(json.toString());
@@ -201,7 +190,7 @@ public class JsonRetriever {
 		//String inputString = param;
 		
 
-		return new Poppy("Json handler");
+		return new Poppy(info);
 	}
 }
 	
