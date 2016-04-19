@@ -8,11 +8,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.log4j.Logger;
 
 public class HttpURLConnectionExample {
 
 	//public final String USER_AGENT = "Mozilla/5.0";
-
+	private static Logger logger = Logger.getLogger(HttpURLConnectionExample.class);
 
 	// HTTP GET request
 	public static String sendGet(String url) throws Exception {
@@ -28,11 +29,14 @@ public class HttpURLConnectionExample {
 
 			//add request header
 			con.setRequestProperty("User-Agent", USER_AGENT);
+			logger.info("Sending 'GET' request to URL : " + url);
 			
 			int responseCode = con.getResponseCode();
-			System.out.println("\nSending 'GET' request to URL : " + url);
-			System.out.println("Response Code : " + responseCode);
-
+			//System.out.println("\nSending 'GET' request to URL : " + url);
+			//System.out.println("Response Code : " + responseCode);
+			
+			logger.info("Response code from " + url + " : " + responseCode);
+			
 			BufferedReader in = new BufferedReader(
 			        new InputStreamReader(con.getInputStream()));
 			String inputLine;
@@ -80,9 +84,12 @@ public class HttpURLConnectionExample {
 	
 		
 		int responseCode = con.getResponseCode();
-		System.out.println("\nSending 'POST' request to URL : " + url);
-		System.out.println("Post parameters : " + urlParameters);
-		System.out.println("Response Code : " + responseCode);
+		//System.out.println("\nSending 'POST' request to URL : " + url);
+		//System.out.println("Post parameters : " + urlParameters);
+		//System.out.println("Response Code : " + responseCode);
+		
+		logger.info("Sending POST to url: " + url  + " With parameters: " + urlParameters);
+		logger.info("Response code from " + url + " : " + responseCode);
 
 		BufferedReader in = new BufferedReader(
 		        new InputStreamReader(con.getInputStream()));

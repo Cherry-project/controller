@@ -6,15 +6,22 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.Object;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import hello.PoppyController;
+
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestBody;
-//import org.springframework.web.bind.annotation.Consumes;
-//import org.springframework.web.bind.annotation.MediaType;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.Category;
+import org.apache.log4j.LogManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -27,7 +34,9 @@ import javax.websocket.Session;
 @RestController
 @RequestMapping("/setup")
 public class SetupController {
-    
+	
+	private static Logger logger = Logger.getLogger(SetupController.class);
+	
 	@RequestMapping("/ip")
 	public Poppy poppy(@RequestParam(value="param", required = false, defaultValue = "null") String a_str, HttpServletRequest request, HttpServletResponse response) 
 	{
@@ -76,25 +85,47 @@ public class SetupController {
 		    System.out.println("\n Ip Adress: " + ip);
 		    
 		    HttpSession session = request.getSession();
+		    
+		    PoppyController.url_to_robot = "http://" + ip + ":8080";
+		    
+		    logger.info("Get robot IP Adress :" + PoppyController.url_to_robot);
+		    
+		    /*String str = "été";
+		    
+		    byte[] bytes = str.getBytes(Charset.forName("UTF-8"));
+		    System.out.println("\n Encode: " + bytes.toString());
+		    
+		    String str_2 = new String(bytes,StandardCharsets.UTF_8);
+		    System.out.println("\n Decode: " + str_2);
+		    LaunchPrimitive.playSpeakPrimitive(str_2);	
+		    
+		    String str_3 = new String(bytes,StandardCharsets.US_ASCII);
+		    System.out.println("\n Decode: " + str_3);
+		    LaunchPrimitive.playSpeakPrimitive(str_3);*/	
+		    
+		    try{
+		    	Thread.sleep(5000);
+		    }
+		    catch(InterruptedException e)
+		    {
+		    	logger.warn("Can't wait with Thread.sleep", e);	
+		    }
+		    
+		    //logger.info("Logger root: " + LogManager.getLoggerRepository());
+		    
+		    //LaunchPrimitive.playSpeakPrimitive("Je suis reveiller!");
+		    
+			
 		    //Session sess = 
 
 		    
 		    //session.setAttribute("success" , "successfully accessed");
 		    //System.out.println("\n Attribut: " +  session.getAttribute("success"));
 		    
-		    System.out.println("\n Id: " +  session.getId());
-		    System.out.println("\n Servlet Context: " +  session.getServletContext());
-		    System.out.println("\n New session ? " + session.isNew());
-		    System.out.println("\n Remotehost" + request.getRemoteHost());
-		    System.out.println("\n Remotehost" + request.getServerName()); // @serveur ec2
-		    System.out.println("\n Remotehost" + request.getLocalAddr());  // @
-		    System.out.println("\n Remotehost" + request.getLocalName());
-		    System.out.println("\n Remotehost" + request.getLocalPort());
-		    
-		    System.out.println("\n Remotehost" + request.getRequestURI());
-		    
-		    
-		    
+		    //System.out.println("\n Id: " +  session.getId());
+		    //System.out.println("\n Servlet Context: " +  session.getServletContext());
+		    //System.out.println("\n New session ? " + session.isNew());
+		    //System.out.println("\n Remotehost" + request.getRemoteHost());
 		    
 		    return new Poppy("Id: " + ip + " HTTP REQ: " + request);
 		    

@@ -3,10 +3,17 @@ package hello;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONArray;
+//LOG
+import org.apache.log4j.Logger;
+
 public class LaunchPresentation {
 
-	private static String url_to_website= PoppyController.url_to_website;
+	//private static String url_to_website= PoppyController.url_to_website;
 	private static int stop = 0; 
+	private static Logger logger = Logger.getLogger(LaunchPresentation.class);
 	
 	public static void start( String excelFilePath) throws InterruptedException, IOException {
 		
@@ -70,6 +77,50 @@ public class LaunchPresentation {
 		System.out.println("\nList of " + "diapo: " + list_img );
 		
 		play(list,list_text,list_img);
+	}
+	
+	public static void playFromJson(JSONObject my_json) throws InterruptedException, IOException {
+	
+		int step_nb = my_json.length();
+		System.out.println("\n Nombre d'etapes: " + step_nb);
+		
+		// Declare Arrays
+		ArrayList<String> list = new ArrayList<String>();
+		list.add(0,"Start");
+		ArrayList<String> list_text = new ArrayList<String>();
+		list_text.add(0,"Start");
+		ArrayList<String> list_img = new ArrayList<String>();
+		list_img.add(0,"Start");
+		
+		for(int i = 0; i < step_nb; i++ ) 
+		{
+			JSONObject loop_json = my_json.getJSONObject("_" + Integer.toString(i));
+			System.out.println("\n" + loop_json.toString() );
+			
+			
+			String behave = loop_json.getString("Behave"); 
+			String text = loop_json.getString("Text"); 
+			String slide = loop_json.getString("Slide"); 
+			
+			list.add(behave.trim());
+			list_text.add(text);
+			list_img.add(slide.trim());
+			
+		}
+		
+		System.out.println("\n Behave: " + list);
+		System.out.println("\n Text: " + list_text);
+		System.out.println("\n Slide: " + list_img);
+	
+		try{
+			play(list, list_text, list_img);
+		}
+		catch(Exception e)
+		{
+			System.out.println("\n Erreur" + e);
+		}
+	
+	
 	}
 		// Play presentation
 	public static void play(ArrayList<String> list, ArrayList<String> list_text, ArrayList<String> list_img ) throws InterruptedException, IOException {
@@ -189,22 +240,27 @@ public class LaunchPresentation {
 		LaunchPrimitive.stopPrimitive("torso_idle_motion");
 		System.out.println("\n Stop behavior: " + "torso_idle_motion");
 		
-		
+		// check listen state
+    	//String listen_state = LaunchPrimitive.getListenStateParameter();
+    	//int is_state = listen_state.indexOf("stop");
+    	
+    	// Si pas en stop
+    	//if(is_state == -1){
 		// Go into normal state => disable stop while speaking
-		LaunchPrimitive.setListenStateParameter("normal");
-		
+    	//	LaunchPrimitive.setListenStateParameter("normal");
+    	//}
 		// Set stop to 0
 		stop = 0;
 		
 		// Back to listen
-		LaunchPrimitive.ListenPrimitive();
+		//LaunchPrimitive.ListenPrimitive();*/
 
 	}
 	public static void stop() throws InterruptedException, IOException {
 		
 		stop = 1;
 		System.out.println("\n Set stop to 1");
-		LaunchPrimitive.setListenStateParameter("normal");
+		//LaunchPrimitive.setListenStateParameter("normal");
 		
 	}
 }

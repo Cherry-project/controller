@@ -16,6 +16,25 @@ public class ListenerController {
 	private ArrayList<String> wait_behave_list = new ArrayList<String>();
 	private ArrayList<String> wait_text_list = new ArrayList<String>();
     
+	@RequestMapping("/hello")
+	public Poppy poppy5(@RequestParam(value="state", defaultValue="off") String str) {
+
+		String info = new String();
+
+		if( str.equals("on")){
+		
+			LaunchPrimitive.playSpeakPrimitive("Bonjour, je suis reveiller");
+			
+			info = "Hello";
+		}
+		else{
+			info = "Not in a Waiting state";
+		}
+		
+		return new Poppy(info);
+		
+	}
+	
 	@RequestMapping("/wait")
 	public Poppy poppy(@RequestParam(value="state", defaultValue="off") String str) {
 
@@ -114,7 +133,7 @@ public class ListenerController {
     			LaunchPrimitive.playBehaviorPrimitive("head_idle_motion");
     		}*/
 			
-			System.out.println("\n Je joue un wait au pif");
+			System.out.println("\n Je joue un wait au hasard");
 		
 			if( wait_behave_list.isEmpty() && wait_text_list.isEmpty()){
 				
@@ -153,4 +172,101 @@ public class ListenerController {
 		
 		return new Poppy(info);
 	}
+	@RequestMapping("/listen_stop")
+	public void stop(@RequestParam(value="state", defaultValue="off") String str) {
+
+		String info = new String();
+
+		if( str.equals("on")){
+			
+			LaunchPrimitive.setListenStateParameter("stop");
+			
+			System.out.println("\n Stop");
+			info = "Listen stop";
+		}
+		else{
+			info = "Not in a Listening state";
+		}
+	
+	}
+	
+	@RequestMapping("/listen_start")
+	public void start(@RequestParam(value="state", defaultValue="off") String str) {
+
+		String info = new String();
+
+		if( str.equals("on")){
+			
+			LaunchPrimitive.setListenStateParameter("normal");
+			//LaunchPrimitive.playSpeakPrimitive("Je suis de retour en mode auto");
+			System.out.println("\n Start");
+			info = "Listen restart";
+		}
+		else{
+			info = "Not in a Listening state";
+		}
+		
+		LaunchPrimitive.ListenPrimitive();
+	
+	}
+	@RequestMapping("/wait_behave_manuel")
+	public Poppy poppy3(@RequestParam(value="state", defaultValue="off") String str) {
+
+		String info = new String();
+		Random rand = new Random();
+
+		if( str.equals("on")){
+			
+			String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
+    		
+			int index_torso = current_primitive.indexOf("torso_idle_motion");
+    		int index_head = current_primitive.indexOf("head_idle_motion");
+    		
+    		if(index_torso == -1){
+    			LaunchPrimitive.playBehaviorPrimitive("torso_idle_motion");
+    		}
+    		/*if(index_head == -1){
+    			LaunchPrimitive.playBehaviorPrimitive("head_idle_motion");
+    		}*/
+			
+    		System.out.println("\n Etat manuel!");
+			System.out.println("\n Je joue un wait au hasard");
+		
+			if( wait_behave_list.isEmpty() && wait_text_list.isEmpty()){
+				
+				// Get list of primitive into Excel file
+				try {
+					wait_behave_list = SimpleExcelReaderExample.getExcelField("./Resources/Attente.xlsx","Behave");
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				//list.add(0,"Start");
+				System.out.println("\nList of " + "Behave: " + wait_behave_list );
+				
+				// Get list of TTS into Excel file
+				try {
+					wait_text_list = SimpleExcelReaderExample.getExcelField("./Resources/Attente.xlsx","Text");
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				//list_text.add(0,"Start");
+				System.out.println("\nList of " + "Text: " + wait_text_list );
+				
+			}
+			
+			LaunchPrimitive.playBehaviorPrimitive(wait_behave_list.get(rand.nextInt(((wait_behave_list.size()-1)+ 1))));
+			LaunchPrimitive.playSpeakPrimitive(wait_text_list.get(rand.nextInt(((wait_behave_list.size()-1)+ 1))));
+			
+			
+			info = "Listening state manuel";
+		}
+		else{
+			info = "Not in a Listening state";
+		}
+		
+		return new Poppy(info);
+	}
+
 }

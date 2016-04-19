@@ -36,38 +36,51 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.core.MediaType;
-
+//LOG
+import org.apache.log4j.Logger;
 
 @RestController
 public class JsonRetriever {
 	 
-    
+	private static Logger logger = Logger.getLogger(JsonRetriever.class);
+	
 	@RequestMapping("/jsonreader")
 	public Poppy poppy(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		  StringBuffer jb = new StringBuffer();
 		  String line = null;
+		  
 		  try {
 		    BufferedReader reader = request.getReader();
 		    while ((line = reader.readLine()) != null)
 		      jb.append(line);
-		  } catch (Exception e) { /*report an error*/ }
+		  } catch (Exception e) { logger.error("Can't read the request", e);}
 		  
 		  System.out.println("\n1		" + jb.toString());
 		  
+		  //Response to Website
+		  /*response.setContentType("text/html");
+		  response.setStatus(HttpServletResponse.SC_OK);
+		  response.getOutputStream();*/
 		  
-		  //try {
-		   	
-			JSONObject my_json =new JSONObject(jb.toString());
-
+		  JSONObject my_json =new JSONObject(jb.toString());
+		  
+		  
+		  try{
+			  logger.info("Play presentation from Website");
+			  LaunchPresentation.playFromJson(my_json);
+		  }
+		  catch(Exception e){
+			  logger.error("Exception raised when attempting to play presentation from WebSite", e);
+		  }
 		  //} catch (Exception e) {
 		    // crash and burn
 			//  System.out.println("\n ERREUR");
 		  //}
 		  
 
-			int step_nb = my_json.length();
-			System.out.println("\n Nombre d'étapes: " + step_nb);
+			/*int step_nb = my_json.length();
+			System.out.println("\n Nombre d'etapes: " + step_nb);
 			
 			// Declare Arrays
 			ArrayList<String> list = new ArrayList<String>();
@@ -103,7 +116,7 @@ public class JsonRetriever {
 			catch(Exception e)
 			{
 				System.out.println("\n Erreur" + e);
-			}
+			}*/
 		
 		
 		
@@ -141,7 +154,7 @@ public class JsonRetriever {
 		
 		
 		int step_nb = json.length();
-		System.out.println("\n Nombre d'étapes: " + step_nb);
+		System.out.println("\n Nombre d'etapes: " + step_nb);
 		System.out.println("\n" + json.toString() );*/
 		
 		// Declare Arrays

@@ -29,7 +29,7 @@ public class MultiplicationController {
 		}
 				
 		// Set listen_state parameter "Multi" 
-		LaunchPrimitive.setListenStateParameter("multi");
+		//LaunchPrimitive.setListenStateParameter("multi");
 		
 		// trigger a random multi
 		if( a_str.equals("null")){
@@ -60,7 +60,8 @@ public class MultiplicationController {
 			return new Poppy("impossible de faire cette multiplication");
 		}
 		
-		LaunchPrimitive.ListenPrimitive();
+		// Back to listen state
+		//LaunchPrimitive.ListenPrimitive();
 		return new Poppy(info);
     }
 	
@@ -87,7 +88,7 @@ public class MultiplicationController {
 			multi.setAlready_Done(0);
 			
 			// Back to normal listen state
-			LaunchPrimitive.setListenStateParameter("normal");
+			//LaunchPrimitive.setListenStateParameter("normal");
 		}
 		else if ( response !=  multi.getResult() && multi.getAlready_Done() == 1)
 		{
@@ -106,7 +107,7 @@ public class MultiplicationController {
 			multi.setAlready_Done(0);
 			
 			// Back to normal listen state
-			LaunchPrimitive.setListenStateParameter("normal");
+			//LaunchPrimitive.setListenStateParameter("normal");
 		}
 			
 
@@ -116,8 +117,47 @@ public class MultiplicationController {
 		info = "R\u00E9ponse de l'enfant: " + response;
 		
 		// back to listen state
-		LaunchPrimitive.ListenPrimitive();
+		//LaunchPrimitive.ListenPrimitive();
 		return new Poppy(info);
     }
+	@RequestMapping("/right_answer")
+	public Poppy rightAnswer(@RequestParam(value="param", defaultValue="Null") int response) {
+		
+		LaunchPrimitive.playSpeakPrimitive("Tu as donn\u00E9 la bonne r\u00E9ponse!");
+		LaunchPrimitive.playBehaviorPrimitive("rest_open_behave");
+		//System.out.println("\n Tu as bien r\u00E9pondu gamin!");
+		
+		// Reset to 0
+		multi.setAlready_Done(0);
+		return new Poppy("Manual answer");
+	
+	}
+	@RequestMapping("/false_answer")
+	public Poppy falseAnswer(@RequestParam(value="param", defaultValue="Null") int response) {
+	
+		if ( multi.getAlready_Done() == 1)
+		{
+			LaunchPrimitive.playSpeakPrimitive("Aie aie aie;  tu n'as pas donn\u00E9 la bonne r\u00E9ponse!");
+			//System.out.println("\n Ce n'est pas la bonne r\u00E9ponse, on l'a refait");
+			multi.playMultiplication(multi);
+
+			
+		}
+		else if ( multi.getAlready_Done() == 2)
+		{
+			LaunchPrimitive.playSpeakPrimitive("Ce n'est toujours pas la bonne r\u00E9ponse, la bonne r\u00E9ponse est " + multi.getResult() );
+			LaunchPrimitive.playBehaviorPrimitive("rest_open_behave");
+			//System.out.println("\n Deux fois faux, ca fait beaucoup gamin! La r\u00E9ponse est " + multi.getResult());
+			
+			// Reset to 0
+			multi.setAlready_Done(0);
+			
+			// Back to normal listen state
+			//LaunchPrimitive.setListenStateParameter("normal");
+		}
+		return new Poppy("Manual answer");
+	
+	}
 }
+
 

@@ -1,17 +1,17 @@
 package hello;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
+import org.apache.log4j.Logger;
 
 public class LaunchPrimitive {
 	
 	private static String url_to_robot = PoppyController.url_to_robot;
+	private static Logger logger = Logger.getLogger(LaunchPrimitive.class);
 	
 	
 	public static void playBehaviorPrimitive(String behavior){
 		
 		try {
+			logger.info("Play Behave Primitive: " + behavior);
 			HttpURLConnectionExample.sendGet(url_to_robot + "/primitive/" + behavior + "/start.json");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -23,6 +23,7 @@ public class LaunchPrimitive {
 	public static void stopPrimitive(String behavior){
 		
 		try {
+			logger.info("Stop Behave Primitive: " + behavior);
 			HttpURLConnectionExample.sendGet(url_to_robot + "/primitive/" + behavior + "/stop.json");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -45,7 +46,7 @@ public class LaunchPrimitive {
 				Thread.sleep(500);
 			}
 			catch(Exception e){
-				System.out.println("\nErreur " +e);
+				System.out.println("\nErreur " + e);
 			}
     		
 			/////////////////////////////////////////////
@@ -69,6 +70,7 @@ public class LaunchPrimitive {
     	// Start Primitive
 
 		try {
+			logger.info("Play Speak Primitive with parameter" + str);
 			HttpURLConnectionExample.sendPost(url_to_robot + "/primitive/" + primitive + "/property/" + property +"/value.json", str);
 			HttpURLConnectionExample.sendGet(url_to_robot + "/primitive/" + primitive + "/start.json");
 		} catch (Exception e) {
@@ -84,7 +86,7 @@ public class LaunchPrimitive {
     	
     	// check listen state
     	String listen_state = LaunchPrimitive.getListenStateParameter();
-    	int is_state = listen_state.indexOf("presentation");
+    	int is_state = listen_state.indexOf("stop");
     	System.out.println("\n		Listen_state: " + listen_state + " Index: " + is_state  );
     	
     	
@@ -119,7 +121,7 @@ public class LaunchPrimitive {
 	    		System.out.println("\n			Wait for speak to stop... ");
 	    	}
 	    	while( index_speak != -1 );
-		}
+		
 		// Start Primitive
 		//LaunchPrimitive.playSpeakPrimitive("Maintenant tu peux me parler");
 		System.out.println("\n Parle!");
@@ -148,21 +150,7 @@ public class LaunchPrimitive {
     		System.out.println("\n			Wait for listen..." );
     	}
     	while( index_listen != -1 );
-    	/*try{
-			Process p = Runtime.getRuntime().exec("python ../primitiveWS-master/src/stt/examples/ecoute.py");
-			System.out.println("\n Done " + p.toString());
-
-			// attente compréhensions
-			
-			while (p.isAlive())
-			{	
-				continue;
-			}
-			p.destroy();
 		}
-		catch(Exception e){
-			System.out.println("\n Erreur" + e);
-		}*/
 		
     	System.out.println("\n Listen finished");
     	ToWebsite.setListeningSignal("off");
