@@ -1,41 +1,18 @@
-package hello;
-
-import java.util.ArrayList;
-import java.util.Map;
+package cherry.gamehandlers.web;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
-import java.text.ParseException;
-import java.io.FileInputStream;
-import java.io.UnsupportedEncodingException;
-
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMethod;
 
-import org.json.JSONException;
+import cherry.robothandlers.service.LaunchPresentation;
+import cherry.robothandlers.service.Poppy;
+
 import org.json.JSONObject;
-import org.json.JSONArray;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.core.MediaType;
 //LOG
 import org.apache.log4j.Logger;
 

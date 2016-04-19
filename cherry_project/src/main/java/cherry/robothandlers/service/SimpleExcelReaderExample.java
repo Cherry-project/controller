@@ -1,4 +1,4 @@
-package hello;
+package cherry.robothandlers.service;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -70,7 +70,7 @@ public class SimpleExcelReaderExample {
 	public static ArrayList<String> getExcelField(String excelFilePath, String field) throws FileNotFoundException, IOException {
 		
 		ArrayList<ArrayList<String>> excelList = SimpleExcelReaderExample.displayExcel(excelFilePath);
-		ArrayList list = new ArrayList();
+		ArrayList<String> list = new ArrayList<String>();
 		
 		
 		if (excelList.get(0).contains(field)) {

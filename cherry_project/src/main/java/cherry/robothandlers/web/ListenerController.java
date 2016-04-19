@@ -1,4 +1,4 @@
-package hello;
+package cherry.robothandlers.web;
 
 import java.util.ArrayList;
 import java.io.IOException;
@@ -7,6 +7,12 @@ import java.io.IOException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import cherry.gamehandlers.service.ToWebsite;
+import cherry.robothandlers.service.LaunchPrimitive;
+import cherry.robothandlers.service.Poppy;
+import cherry.robothandlers.service.SimpleExcelReaderExample;
+
 import java.util.Random;
 
 @RestController
@@ -47,7 +53,7 @@ public class ListenerController {
 			String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
     		
 			int index_torso = current_primitive.indexOf("torso_idle_motion");
-    		int index_head = current_primitive.indexOf("head_idle_motion");
+    		//int index_head = current_primitive.indexOf("head_idle_motion");
     		
     		if(index_torso == -1){
     			LaunchPrimitive.playBehaviorPrimitive("torso_idle_motion");
@@ -124,7 +130,7 @@ public class ListenerController {
 			String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
     		
 			int index_torso = current_primitive.indexOf("torso_idle_motion");
-    		int index_head = current_primitive.indexOf("head_idle_motion");
+    		//int index_head = current_primitive.indexOf("head_idle_motion");
     		
     		if(index_torso == -1){
     			LaunchPrimitive.playBehaviorPrimitive("torso_idle_motion");
@@ -173,7 +179,7 @@ public class ListenerController {
 		return new Poppy(info);
 	}
 	@RequestMapping("/listen_stop")
-	public void stop(@RequestParam(value="state", defaultValue="off") String str) {
+	public Poppy stop(@RequestParam(value="state", defaultValue="off") String str) {
 
 		String info = new String();
 
@@ -187,11 +193,11 @@ public class ListenerController {
 		else{
 			info = "Not in a Listening state";
 		}
-	
+		return new Poppy(info);
 	}
 	
 	@RequestMapping("/listen_start")
-	public void start(@RequestParam(value="state", defaultValue="off") String str) {
+	public Poppy start(@RequestParam(value="state", defaultValue="off") String str) {
 
 		String info = new String();
 
@@ -207,7 +213,7 @@ public class ListenerController {
 		}
 		
 		LaunchPrimitive.ListenPrimitive();
-	
+		return new Poppy(info);
 	}
 	@RequestMapping("/wait_behave_manuel")
 	public Poppy poppy3(@RequestParam(value="state", defaultValue="off") String str) {
@@ -220,7 +226,7 @@ public class ListenerController {
 			String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
     		
 			int index_torso = current_primitive.indexOf("torso_idle_motion");
-    		int index_head = current_primitive.indexOf("head_idle_motion");
+    		//int index_head = current_primitive.indexOf("head_idle_motion");
     		
     		if(index_torso == -1){
     			LaunchPrimitive.playBehaviorPrimitive("torso_idle_motion");

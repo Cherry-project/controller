@@ -1,20 +1,16 @@
-package hello;
+package cherry.robothandlers.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
-//LOG
-import org.apache.log4j.Logger;
+
+import cherry.gamehandlers.service.ToWebsite;
 
 public class LaunchPresentation {
 
 	//private static String url_to_website= PoppyController.url_to_website;
 	private static int stop = 0; 
-	private static Logger logger = Logger.getLogger(LaunchPresentation.class);
-	
 	public static void start( String excelFilePath) throws InterruptedException, IOException {
 		
 		// Listen signal "off"
@@ -211,9 +207,6 @@ public class LaunchPresentation {
 
 			}
 			
-			// text
-			//LaunchPrimitive.playSpeakPrimitive(list_text.get(i));
-			String i_str = Integer.toString(i);
 			LaunchPrimitive.playSpeakPrimitive(list_text.get(i));
 			System.out.println("\n Speak: " + list_text.get(i));
 			

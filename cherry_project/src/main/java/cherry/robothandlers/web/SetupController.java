@@ -1,35 +1,15 @@
-package hello;
-
-import java.util.ArrayList;
-
-import java.io.File;
-import java.io.IOException;
-import java.lang.Object;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+package cherry.robothandlers.web;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import hello.PoppyController;
-
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RequestBody;
+import cherry.robothandlers.web.PoppyController;
+import cherry.robothandlers.service.Poppy;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.Category;
-import org.apache.log4j.LogManager;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.websocket.RemoteEndpoint;
-import javax.websocket.Session;
 
 @RestController
 @RequestMapping("/setup")
@@ -40,15 +20,7 @@ public class SetupController {
 	@RequestMapping("/ip")
 	public Poppy poppy(@RequestParam(value="param", required = false, defaultValue = "null") String a_str, HttpServletRequest request, HttpServletResponse response) 
 	{
-			String info = a_str;
-			/*String ip_adress = request.getHeader("X-FORWARDED-FOR");
-			
-			if (ip_adress == null) {  
-				   ip_adress = request.getRemoteAddr();  
-			   }
-	        System.out.println(ip_adress);*/
-			
-		 	String ip = request.getHeader("X-Forwarded-For");  
+			String ip = request.getHeader("X-Forwarded-For");  
 		    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {  
 		        ip = request.getHeader("Proxy-Client-IP");  
 		    }  
@@ -83,8 +55,6 @@ public class SetupController {
 		        ip = request.getRemoteAddr();  
 		    }  
 		    System.out.println("\n Ip Adress: " + ip);
-		    
-		    HttpSession session = request.getSession();
 		    
 		    PoppyController.url_to_robot = "http://" + ip + ":8080";
 		    
