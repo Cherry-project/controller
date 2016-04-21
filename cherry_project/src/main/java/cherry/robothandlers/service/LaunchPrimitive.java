@@ -44,37 +44,40 @@ public class LaunchPrimitive {
     	
     	String str = "\"" + txtString + "\"";
     	
-    	do {
-			try{
-				Thread.sleep(500);
-			}
-			catch(Exception e){
-				System.out.println("\nErreur " + e);
-			}
-    		
-			/////////////////////////////////////////////
-			
-			/*try {
-				current_primitive = HttpURLConnectionExample.sendGet(url_to_robot + "/primitive/running/list.json");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
-			
-			String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
-    		////////////////////////////////////////////
-    		
-    		index_speak = current_primitive.indexOf("speak");
-    		System.out.println("\n			Primitive: " + current_primitive );
-    		System.out.println("\n			Wait for speak to stop... ");
-    	}
-    	while( index_speak != -1 );
+    	
+		try{
+			Thread.sleep(100);
+		}
+		catch(Exception e){
+			System.out.println("\nErreur " + e);
+		}
     
     	// Start Primitive
 
 		try {
 			logger.info("Play Speak Primitive with parameter" + str);
+			// Set Parameter
 			HttpURLConnectionExample.sendPost(url_to_robot + "/primitive/" + primitive + "/property/" + property +"/value.json", str);
+			
+			do {
+				try{
+					Thread.sleep(100);
+				}
+				catch(Exception e){
+					System.out.println("\nErreur " + e);
+				}
+	    		
+				/////////////////////////////////////////////			
+				String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
+	    		////////////////////////////////////////////
+	    		
+	    		index_speak = current_primitive.indexOf("speak");
+	    		System.out.println("\n			Primitive: " + current_primitive );
+	    		System.out.println("\n			Wait for speak to stop... ");
+	    	}
+	    	while( index_speak != -1 );
+			
+			// Start speak
 			HttpURLConnectionExample.sendGet(url_to_robot + "/primitive/" + primitive + "/start.json");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
