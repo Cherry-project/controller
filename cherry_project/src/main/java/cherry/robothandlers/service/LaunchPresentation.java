@@ -10,7 +10,9 @@ import cherry.gamehandlers.service.ToWebsite;
 public class LaunchPresentation {
 
 	//private static String url_to_website= PoppyController.url_to_website;
+	private static int is_presentation_running = 0;
 	private static int stop = 0; 
+	
 	public static void start( String excelFilePath) throws InterruptedException, IOException {
 		
 		// Listen signal "off"
@@ -138,6 +140,7 @@ public class LaunchPresentation {
 			LaunchPrimitive.stopPrimitive("head_idle_motion");
 		}
 		
+		//Play presentation
 		for(int i=1; i< list.size(); i++){
 			
 			if (stop == 1){
@@ -178,58 +181,53 @@ public class LaunchPresentation {
 			if ( !list_img.get(i).equals(list_img.get(i-1)))
 			{	
 				System.out.println("\n Old: " + list_img.get(i-1) + " New: " + list_img.get(i));
-				// Shut down previous img (exept "start)
+				// Shut down previous img (except "start)
   				if (list_img.get(i-1) != "Start"){
 					
   					ToWebsite.deletePicture(list_img.get(i-1));
-  					/*try {
-						HttpURLConnectionExample.sendGet( url_to_website + "/PhpProject_test/WS_video.php?name=" + list_img.get(i-1) + "&owner=admin_off");
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						System.out.println("\n Erreur" + e);
-						e.printStackTrace();
-					}*/
+
 				}
 				// set the new one
   				index_img = i;
   				ToWebsite.displayPicture(list_img.get(index_img));
   				
-  				/*try {
-					
-					HttpURLConnectionExample.sendGet(url_to_website + "/PhpProject_test/WS_video.php?name=" + list_img.get(index_img));
-					System.out.println("\n" + url_to_website + "/PhpProject_test/WS_video.php?name=" + list_img.get(index_img));
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					System.out.println("\n Erreur" + e);
-					e.printStackTrace();
-				}*/
 				Thread.sleep(1000);
 
 			}
 			
+			// Speak
 			LaunchPrimitive.playSpeakPrimitive(list_text.get(i));
 			System.out.println("\n Speak: " + list_text.get(i));
 			
-			// behavior
-			LaunchPrimitive.playBehaviorPrimitive(list.get(i));
-			System.out.println("\n Play behavior: " + list.get(i));
+			// Behavior if not wait
+			if (list.get(i).indexOf("wait") == -1)
+			{
+				LaunchPrimitive.playBehaviorPrimitive(list.get(i));
+				System.out.println("\n Play behavior: " + list.get(i));
+			}
+			//if wait, get time to wait
+			else 
+			{	
+				int time_to_wait = 0 ;
 				
+				try{
+					time_to_wait = Integer.parseInt(list.get(i).substring(list.get(i).indexOf("(")+1, list.get(i).indexOf(")")));
+				} catch (NumberFormatException nfe) {
+					System.out.println("Not an Integer!" );
+				}
+				
+				System.out.println("I wait " + Integer.toString(time_to_wait) + "s");
+				Thread.sleep(time_to_wait*1000);
+
+			}
 			
 		}
 		
 		Thread.sleep(4000);
 		// Kill the last diapo
+		
 		ToWebsite.deletePicture(list_img.get(index_img));
 		
-		/*
-		 try {
-			HttpURLConnectionExample.sendGet(url_to_website + "/WS_video.php?name="  + list_img.get(index_img) +"&owner=admin_off");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			System.out.println("\n Erreur" + e);
-			e.printStackTrace();
-		}	// TODO Auto-generated method stub
-		*/
 		LaunchPrimitive.stopPrimitive("torso_idle_motion");
 		System.out.println("\n Stop behavior: " + "torso_idle_motion");
 		
