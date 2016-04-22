@@ -10,12 +10,13 @@ import cherry.gamehandlers.service.ToWebsite;
 public class LaunchPresentation {
 
 	//private static String url_to_website= PoppyController.url_to_website;
-	private static int is_presentation_running = 0;
+	public static int is_presentation_running = 0;
 	private static int stop = 0; 
 	
 	public static void start( String excelFilePath) throws InterruptedException, IOException {
 		
 		// Listen signal "off"
+		is_presentation_running = 1;
 		ToWebsite.setListeningSignal("off");
 		
 		// Go into presentation state => enable stop while speaking
@@ -79,6 +80,8 @@ public class LaunchPresentation {
 	
 	public static void playFromJson(JSONObject my_json) throws InterruptedException, IOException {
 	
+		is_presentation_running = 1;
+		
 		int step_nb = my_json.length();
 		System.out.println("\n Nombre d'etapes: " + step_nb);
 		
@@ -121,7 +124,7 @@ public class LaunchPresentation {
 	
 	}
 		// Play presentation
-	public static void play(ArrayList<String> list, ArrayList<String> list_text, ArrayList<String> list_img ) throws InterruptedException, IOException {
+	private static void play(ArrayList<String> list, ArrayList<String> list_text, ArrayList<String> list_img ) throws InterruptedException, IOException {
 		
 		int index_behave = -1;
 		int index_speak = -1;
@@ -240,8 +243,10 @@ public class LaunchPresentation {
 		// Go into normal state => disable stop while speaking
     	//	LaunchPrimitive.setListenStateParameter("normal");
     	//}
-		// Set stop to 0
-		stop = 0;
+		
+		// Set stop to 0		
+		stop = 0;	
+		is_presentation_running = 0;
 		
 		// Back to listen
 		//LaunchPrimitive.ListenPrimitive();*/
