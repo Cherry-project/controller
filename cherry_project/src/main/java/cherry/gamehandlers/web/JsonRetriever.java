@@ -54,7 +54,7 @@ public class JsonRetriever {
 			  return new Poppy(info);
 			  }
 		  
-		  if(LaunchPresentation.is_presentation_running == 0)
+		  if(!LaunchPresentation.is_presentation_running)
 		  {
 			  try{
 				  logger.info("Play presentation from Website");

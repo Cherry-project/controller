@@ -10,13 +10,13 @@ import cherry.gamehandlers.service.ToWebsite;
 public class LaunchPresentation {
 
 	//private static String url_to_website= PoppyController.url_to_website;
-	public static int is_presentation_running = 0;
-	private static int stop = 0; 
+	public static boolean is_presentation_running = false;
+	private static boolean stop = false; 
 	
 	public static void start( String excelFilePath) throws InterruptedException, IOException {
 		
 		// Listen signal "off"
-		is_presentation_running = 1;
+		is_presentation_running = true;
 		ToWebsite.setListeningSignal("off");
 		
 		// Go into presentation state => enable stop while speaking
@@ -80,7 +80,7 @@ public class LaunchPresentation {
 	
 	public static void playFromJson(JSONObject my_json) throws InterruptedException, IOException {
 	
-		is_presentation_running = 1;
+		is_presentation_running = true;
 		
 		int step_nb = my_json.length();
 		System.out.println("\n Nombre d'etapes: " + step_nb);
@@ -146,10 +146,10 @@ public class LaunchPresentation {
 		//Play presentation
 		for(int i=1; i< list.size(); i++){
 			
-			if (stop == 1){
+			if (stop){
 				LaunchPrimitive.playSpeakPrimitive("D'accord, j'arr\u00eate la pr\u00e9sentation");
 				LaunchPrimitive.playBehaviorPrimitive("rest_open_behave");
-				stop = 0;
+				stop = false;
 				break;
 			}
 			// Check currently running primitive
@@ -211,8 +211,29 @@ public class LaunchPresentation {
 			//if wait, get time to wait
 			else 
 			{	
+				
 				int time_to_wait = 0 ;
 				
+				// Waiting for SPEAK to STOP
+				do {
+					try{
+						Thread.sleep(100);
+					}
+					catch(Exception e){
+						System.out.println("\nErreur " + e);
+					}
+		    		
+					/////////////////////////////////////////////			
+					current_primitive = LaunchPrimitive.getRunningPrimitiveList();
+		    		////////////////////////////////////////////
+		    		
+		    		index_speak = current_primitive.indexOf("speak");
+		    		System.out.println("\n			Primitive: " + current_primitive );
+		    		System.out.println("\n			Wait for speak to stop... ");
+		    	}
+		    	while( index_speak != -1 );
+				
+				// And WAIT
 				try{
 					time_to_wait = Integer.parseInt(list.get(i).substring(list.get(i).indexOf("(")+1, list.get(i).indexOf(")")));
 				} catch (NumberFormatException nfe) {
@@ -245,8 +266,8 @@ public class LaunchPresentation {
     	//}
 		
 		// Set stop to 0		
-		stop = 0;	
-		is_presentation_running = 0;
+		stop = false;	
+		is_presentation_running = false;
 		
 		// Back to listen
 		//LaunchPrimitive.ListenPrimitive();*/
@@ -254,8 +275,15 @@ public class LaunchPresentation {
 	}
 	public static void stop() throws InterruptedException, IOException {
 		
-		stop = 1;
-		System.out.println("\n Set stop to 1");
+		if(is_presentation_running){
+			stop = true;
+			System.out.println("\n Set stop to 1");
+		}
+		else
+		{
+			System.out.println("\n No presentation running");
+		}
+		
 		//LaunchPrimitive.setListenStateParameter("normal");
 		
 	}
