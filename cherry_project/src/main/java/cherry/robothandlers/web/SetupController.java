@@ -60,19 +60,6 @@ public class SetupController {
 		    
 		    logger.info("Get robot IP Adress :" + PoppyController.url_to_robot);
 		    
-		    /*String str = "été";
-		    
-		    byte[] bytes = str.getBytes(Charset.forName("UTF-8"));
-		    System.out.println("\n Encode: " + bytes.toString());
-		    
-		    String str_2 = new String(bytes,StandardCharsets.UTF_8);
-		    System.out.println("\n Decode: " + str_2);
-		    LaunchPrimitive.playSpeakPrimitive(str_2);	
-		    
-		    String str_3 = new String(bytes,StandardCharsets.US_ASCII);
-		    System.out.println("\n Decode: " + str_3);
-		    LaunchPrimitive.playSpeakPrimitive(str_3);*/	
-		    
 		    try{
 		    	Thread.sleep(5000);
 		    }
