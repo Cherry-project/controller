@@ -3,11 +3,13 @@ package cherry.robothandlers.service;
 import org.apache.log4j.Logger;
 
 import cherry.gamehandlers.service.ToWebsite;
-import cherry.robothandlers.web.PoppyController;
+import cherry.robothandlers.web.SetupController;
+import cherry.robotpresentateur.service.Robot;
 
 public class LaunchPrimitive {
 	
-	private static String url_to_robot = PoppyController.url_to_robot;
+	//private static String url_to_robot = SetupController.url_to_robot;
+	
 	private static Logger logger = Logger.getLogger(LaunchPrimitive.class);
 	
 	
@@ -15,7 +17,7 @@ public class LaunchPrimitive {
 		
 		try {
 			logger.info("Play Behave Primitive: " + behavior);
-			HttpURLConnectionExample.sendGet(url_to_robot + "/primitive/" + behavior + "/start.json");
+			HttpURLConnectionExample.sendGet(SetupController.url_to_robot + "/primitive/" + behavior + "/start.json");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -27,7 +29,7 @@ public class LaunchPrimitive {
 		
 		try {
 			logger.info("Stop Behave Primitive: " + behavior);
-			HttpURLConnectionExample.sendGet(url_to_robot + "/primitive/" + behavior + "/stop.json");
+			HttpURLConnectionExample.sendGet(SetupController.url_to_robot + "/primitive/" + behavior + "/stop.json");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -40,7 +42,8 @@ public class LaunchPrimitive {
 		
 		String primitive = "speak";
     	String property = "sentence_to_speak";
-    	int index_speak;
+    	String current_url_to_robot = SetupController.url_to_robot;
+    	//int index_speak;
     	
     	String str = "\"" + txtString + "\"";
     	
@@ -56,10 +59,11 @@ public class LaunchPrimitive {
 
 		try {
 			logger.info("Play Speak Primitive with parameter" + str);
-			// Set Parameter
-			HttpURLConnectionExample.sendPost(url_to_robot + "/primitive/" + primitive + "/property/" + property +"/value.json", str);
 			
-			do {
+			// Set Parameter to current robot
+			HttpURLConnectionExample.sendPost(current_url_to_robot + "/primitive/" + primitive + "/property/" + property +"/value.json", str);
+			
+			/*do {
 				try{
 					Thread.sleep(100);
 				}
@@ -75,10 +79,17 @@ public class LaunchPrimitive {
 	    		System.out.println("\n			Primitive: " + current_primitive );
 	    		System.out.println("\n			Wait for speak to stop... ");
 	    	}
-	    	while( index_speak != -1 );
+	    	while( index_speak != -1 );*/
+			
+			// Wait for all robots to stop speaking
+			waitForSpeakToStop();			
+			
+			// Back to current robot
+			SetupController.url_to_robot = current_url_to_robot;
 			
 			// Start speak
-			HttpURLConnectionExample.sendGet(url_to_robot + "/primitive/" + primitive + "/start.json");
+			HttpURLConnectionExample.sendGet(current_url_to_robot + "/primitive/" + primitive + "/start.json");
+		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -86,7 +97,48 @@ public class LaunchPrimitive {
   	
 	}
 	
-	public static void ListenPrimitive(){
+	// Waiting for all robots to stop speaking
+	public static void waitForSpeakToStop(){
+		
+		int index_speak;
+		System.out.println("\nLaunchPresentation" + LaunchPresentation.robots_used);
+		for(Robot robot : SetupController.robot_list){
+			
+			for(String robot_str : LaunchPresentation.robots_used){
+				
+			
+				if (robot.getName().equals(robot_str))
+				{
+					System.out.println("\nWaiting for robot " + robot_str + "to stop speaking");
+					SetupController.url_to_robot= robot.getIp().toString();
+					
+					do {
+						try{
+							Thread.sleep(100);
+						}
+						catch(Exception e){
+							System.out.println("\nErreur " + e);
+						}
+			    		
+						
+						/////////////////////////////////////////////			
+						String current_primitive = getRunningPrimitiveList();
+			    		////////////////////////////////////////////
+			    		
+			    		index_speak = current_primitive.indexOf("speak");
+
+			    	}
+			    	while( index_speak != -1 );
+					System.out.println("\nRobot " + robot_str + " stopped");
+				}
+			
+			}
+		}
+		
+		
+	}
+	
+	public static void listenPrimitive(){
 		
     	String property = "listen";
     	
@@ -168,7 +220,7 @@ public class LaunchPrimitive {
     	// Start Primitive
     	String current_primitive  = new String();
 		try {
-			current_primitive = HttpURLConnectionExample.sendGet(url_to_robot + "/primitive/running/list.json");
+			current_primitive = HttpURLConnectionExample.sendGet(SetupController.url_to_robot + "/primitive/running/list.json");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

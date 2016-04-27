@@ -17,9 +17,9 @@ import org.apache.log4j.Logger;
 public class PoppyController {
 	
 	//public static String url_to_robot = "http://127.0.0.2:8888";
-	public static String url_to_robot = "http://192.168.1.104:8080";
+	//public static String url_to_robot = "http://192.168.1.104:8080";
 	//public static String url_to_website = "http://52.50.54.27";
-	public static String url_to_website = "http://192.168.1.103:80";
+	//public static String url_to_website = "http://192.168.1.103:80";
 	
 	private static Logger logger = Logger.getLogger(PoppyController.class);
 	
