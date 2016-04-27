@@ -3,11 +3,11 @@ package cherry.gamehandlers.service;
 import org.apache.log4j.Logger;
 
 import cherry.robothandlers.service.HttpURLConnectionExample;
-import cherry.robothandlers.web.PoppyController;
+import cherry.robothandlers.web.SetupController;
 
 public class ToWebsite {
 	
-	private static String url_to_website = PoppyController.url_to_website;
+	private static String url_to_website = SetupController.url_to_website;
 	private static Logger logger = Logger.getLogger(ToWebsite.class);
 	
 	public static void displayPicture(String picture_name){

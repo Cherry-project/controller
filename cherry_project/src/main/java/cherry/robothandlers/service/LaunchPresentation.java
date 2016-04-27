@@ -2,22 +2,29 @@ package cherry.robothandlers.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.json.JSONObject;
 
 import cherry.gamehandlers.service.ToWebsite;
+import cherry.robothandlers.web.SetupController;
+import cherry.robotpresentateur.service.Robot;;
 
 public class LaunchPresentation {
-
-	//private static String url_to_website= PoppyController.url_to_website;
+	
+	// Status 
 	public static boolean is_presentation_running = false;
-	private static boolean stop = false; 
+	private static boolean stop = false;
+	
+	private static ArrayList<Robot> robot_list = SetupController.robot_list;
+	public static  Set<String> robots_used; 
 	
 	public static void start( String excelFilePath) throws InterruptedException, IOException {
 		
 		// Listen signal "off"
-		is_presentation_running = true;
 		ToWebsite.setListeningSignal("off");
+		is_presentation_running = true;
 		
 		// Go into presentation state => enable stop while speaking
 		//LaunchPrimitive.setListenStateParameter("presentation");
@@ -41,19 +48,20 @@ public class LaunchPresentation {
 		
 		
 		// Declare Arrays
-		ArrayList<String> list = new ArrayList<String>();
+		ArrayList<String> list_behave = new ArrayList<String>();
 		ArrayList<String> list_text = new ArrayList<String>();
 		ArrayList<String> list_img = new ArrayList<String>();
+		ArrayList<String> list_robot = new ArrayList<String>();
 		
 		// Get list of primitive into Excel file
 		try {
-			list = SimpleExcelReaderExample.getExcelField(excelFilePath,"Behave");
+			list_behave = SimpleExcelReaderExample.getExcelField(excelFilePath,"Behave");
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		list.add(0,"Start");
-		System.out.println("\nList of " + "Behave: " + list );
+		list_behave.add(0,"Start");
+		System.out.println("\nList of " + "Behave: " + list_behave );
 		
 		// Get list of TTS into Excel file
 		try {
@@ -75,23 +83,37 @@ public class LaunchPresentation {
 		list_img.add(0,"Start");
 		System.out.println("\nList of " + "diapo: " + list_img );
 		
-		play(list,list_text,list_img);
+		//Get list of picture to display
+		try {
+			list_robot= SimpleExcelReaderExample.getExcelField(excelFilePath,"Robot");
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		list_robot.add(0,"Start");
+		System.out.println("\nList of " + "diapo: " + list_robot );
+		
+		play(list_behave,list_text,list_img, list_robot);
 	}
 	
 	public static void playFromJson(JSONObject my_json) throws InterruptedException, IOException {
-	
+		// Set presentation bit
 		is_presentation_running = true;
 		
 		int step_nb = my_json.length();
 		System.out.println("\n Nombre d'etapes: " + step_nb);
 		
+		
+		
 		// Declare Arrays
-		ArrayList<String> list = new ArrayList<String>();
-		list.add(0,"Start");
+		ArrayList<String> list_behave = new ArrayList<String>();
+		list_behave.add(0,"Start");
 		ArrayList<String> list_text = new ArrayList<String>();
 		list_text.add(0,"Start");
 		ArrayList<String> list_img = new ArrayList<String>();
 		list_img.add(0,"Start");
+		ArrayList<String> list_robot= new ArrayList<String>();
+		list_robot.add(0,"Start");
 		
 		for(int i = 0; i < step_nb; i++ ) 
 		{
@@ -101,20 +123,23 @@ public class LaunchPresentation {
 			
 			String behave = loop_json.getString("Behave"); 
 			String text = loop_json.getString("Text"); 
-			String slide = loop_json.getString("Slide"); 
+			String slide = loop_json.getString("Slide");
+			String robot= loop_json.getString("Robot"); 
 			
-			list.add(behave.trim());
+			list_behave.add(behave.trim());
 			list_text.add(text);
 			list_img.add(slide.trim());
+			list_robot.add(robot.trim());
 			
 		}
 		
-		System.out.println("\n Behave: " + list);
+		System.out.println("\n Behave: " + list_behave);
 		System.out.println("\n Text: " + list_text);
 		System.out.println("\n Slide: " + list_img);
+		System.out.println("\n Slide: " + list_robot);
 	
 		try{
-			play(list, list_text, list_img);
+			play(list_behave, list_text, list_img, list_robot);
 		}
 		catch(Exception e)
 		{
@@ -124,16 +149,48 @@ public class LaunchPresentation {
 	
 	}
 		// Play presentation
-	private static void play(ArrayList<String> list, ArrayList<String> list_text, ArrayList<String> list_img ) throws InterruptedException, IOException {
+	public static void play(ArrayList<String> list_behave, ArrayList<String> list_text, ArrayList<String> list_img, ArrayList<String> list_robot ) throws InterruptedException, IOException {
 		
+		// Robot to be used
+		robots_used = new HashSet<String>(list_robot);
+		
+		// Make them move 
+		for(Robot robot : robot_list){
+			
+			for(String robot_str : robots_used){
+				
+			
+				if (robot.getName().equals(robot_str))
+				{
+					SetupController.url_to_robot= robot.getIp().toString();
+					
+					String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
+					
+					int index_torso = current_primitive.indexOf("torso_idle_motion");
+					int index_head = current_primitive.indexOf("head_idle_motion");
+					
+					if(index_torso == -1){
+						LaunchPrimitive.playBehaviorPrimitive("torso_idle_motion");
+					}
+					if(index_head != -1){
+						LaunchPrimitive.stopPrimitive("head_idle_motion");
+					}
+				}
+			
+			}
+		}
+
+		
+		// Set indexes
 		int index_behave = -1;
 		int index_speak = -1;
 		int index_img = -1;
 		
+		
 		// Stop head, start torso if not done
 		String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
 		
-		int index_torso = current_primitive.indexOf("torso_idle_motion");
+		/*int index_torso = current_primitive.indexOf("torso_idle_motion");
 		int index_head = current_primitive.indexOf("head_idle_motion");
 		
 		if(index_torso == -1){
@@ -141,14 +198,16 @@ public class LaunchPresentation {
 		}
 		if(index_head != -1){
 			LaunchPrimitive.stopPrimitive("head_idle_motion");
-		}
+		}*/
 		
 		//Play presentation
-		for(int i=1; i< list.size(); i++){
+		for(int i=1; i< list_behave.size(); i++){
 			
+			// In case of stop
 			if (stop){
 				LaunchPrimitive.playSpeakPrimitive("D'accord, j'arr\u00eate la pr\u00e9sentation");
-				LaunchPrimitive.playBehaviorPrimitive("rest_open_behave");
+				//LaunchPrimitive.playBehaviorPrimitive("rest_open_behave");
+				
 				stop = false;
 				break;
 			}
@@ -157,10 +216,10 @@ public class LaunchPresentation {
 			current_primitive = LaunchPrimitive.getRunningPrimitiveList();
 			System.out.println("\nStr " + current_primitive );
 			
-			index_behave = current_primitive.indexOf(list.get(i-1));
+			index_behave = current_primitive.indexOf(list_behave.get(i-1));
 			index_speak = current_primitive.indexOf("speak");
 			
-			System.out.println("\nIndex: " + index_behave +"of :" + list.get(i-1) + " speak: " + index_speak);
+			System.out.println("\nIndex: " + index_behave +"of :" + list_behave.get(i-1) + " speak: " + index_speak);
 			
 			// Check wether speak or behave are still running
 			//while( index_speak != -1 && index_behave != -1)
@@ -168,15 +227,15 @@ public class LaunchPresentation {
 			{
 				Thread.sleep(1000);
 				
-				System.out.println("\n			Wainting for " + list.get(i-1) + " to stop" );
+				System.out.println("\n			Wainting for " + list_behave.get(i-1) + " to stop" );
 				
 				current_primitive = LaunchPrimitive.getRunningPrimitiveList();
 				System.out.println("\n			Str " + current_primitive );
 				
-				index_behave = current_primitive.indexOf(list.get(i-1));
+				index_behave = current_primitive.indexOf(list_behave.get(i-1));
     			index_speak = current_primitive.indexOf("speak");
 				
-    			System.out.println("\n			Index: " + index_behave +" of behave: " + list.get(i-1) + " of speak: " + index_speak);
+    			System.out.println("\n			Index: " + index_behave +" of behave: " + list_behave.get(i-1) + " of speak: " + index_speak);
     			
 			}
 			
@@ -195,47 +254,40 @@ public class LaunchPresentation {
   				ToWebsite.displayPicture(list_img.get(index_img));
   				
 				Thread.sleep(1000);
-
 			}
 			
+			// Wait for current robot to stop speaking
+			//LaunchPrimitive.waitForSpeakToStop();
+			
+			// Get appropriate IP
+			for(Robot robot : robot_list){
+				
+				System.out.println("\n Current Name"+ robot.getName() + " : " + robot.getIp() + "Name in JSON: " + list_robot.get(i).toString());
+				
+				if (robot.getName().equals(list_robot.get(i).toString()))
+				{
+					SetupController.url_to_robot= robot.getIp().toString();
+					System.out.println("\n Set New IP to robot "+ robot.getName() + " : " + robot.getIp());
+					break;
+				}
+			}
 			// Speak
 			LaunchPrimitive.playSpeakPrimitive(list_text.get(i));
 			System.out.println("\n Speak: " + list_text.get(i));
 			
 			// Behavior if not wait
-			if (list.get(i).indexOf("wait") == -1)
+			if (list_behave.get(i).indexOf("wait") == -1)
 			{
-				LaunchPrimitive.playBehaviorPrimitive(list.get(i));
-				System.out.println("\n Play behavior: " + list.get(i));
+				LaunchPrimitive.playBehaviorPrimitive(list_behave.get(i));
+				System.out.println("\n Play behavior: " + list_behave.get(i));
 			}
 			//if wait, get time to wait
 			else 
 			{	
-				
 				int time_to_wait = 0 ;
 				
-				// Waiting for SPEAK to STOP
-				do {
-					try{
-						Thread.sleep(100);
-					}
-					catch(Exception e){
-						System.out.println("\nErreur " + e);
-					}
-		    		
-					/////////////////////////////////////////////			
-					current_primitive = LaunchPrimitive.getRunningPrimitiveList();
-		    		////////////////////////////////////////////
-		    		
-		    		index_speak = current_primitive.indexOf("speak");
-		    		System.out.println("\n			Primitive: " + current_primitive );
-		    		System.out.println("\n			Wait for speak to stop... ");
-		    	}
-		    	while( index_speak != -1 );
-				
-				// And WAIT
 				try{
-					time_to_wait = Integer.parseInt(list.get(i).substring(list.get(i).indexOf("(")+1, list.get(i).indexOf(")")));
+					time_to_wait = Integer.parseInt(list_behave.get(i).substring(list_behave.get(i).indexOf("(")+1, list_behave.get(i).indexOf(")")));
 				} catch (NumberFormatException nfe) {
 					System.out.println("Not an Integer!" );
 				}
@@ -252,8 +304,23 @@ public class LaunchPresentation {
 		
 		ToWebsite.deletePicture(list_img.get(index_img));
 		
-		LaunchPrimitive.stopPrimitive("torso_idle_motion");
-		System.out.println("\n Stop behavior: " + "torso_idle_motion");
+		// Stop all the robots engaged
+		for(Robot robot : robot_list){
+			
+			for(String robot_str : robots_used){
+				
+			
+				if (robot.getName().equals(robot_str))
+				{
+					SetupController.url_to_robot= robot.getIp().toString();
+					System.out.println("\n I stop "+ robot.getName());
+					
+					LaunchPrimitive.playBehaviorPrimitive("rest_open_behave");
+					LaunchPrimitive.stopPrimitive("torso_idle_motion");
+				}
+			
+			}
+		}
 		
 		// check listen state
     	//String listen_state = LaunchPrimitive.getListenStateParameter();
@@ -264,8 +331,7 @@ public class LaunchPresentation {
 		// Go into normal state => disable stop while speaking
     	//	LaunchPrimitive.setListenStateParameter("normal");
     	//}
-		
-		// Set stop to 0		
+		// Set stop to 0
 		stop = false;	
 		is_presentation_running = false;
 		
@@ -283,7 +349,6 @@ public class LaunchPresentation {
 		{
 			System.out.println("\n No presentation running");
 		}
-		
 		//LaunchPrimitive.setListenStateParameter("normal");
 		
 	}

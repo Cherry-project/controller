@@ -23,7 +23,7 @@ public class ListenerController {
 	private ArrayList<String> wait_text_list = new ArrayList<String>();
     
 	@RequestMapping("/hello")
-	public Poppy poppy5(@RequestParam(value="state", defaultValue="off") String str) {
+	public Poppy hello(@RequestParam(value="state", defaultValue="off") String str) {
 
 		String info = new String();
 
@@ -42,7 +42,7 @@ public class ListenerController {
 	}
 	
 	@RequestMapping("/wait")
-	public Poppy poppy(@RequestParam(value="state", defaultValue="off") String str) {
+	public Poppy wait(@RequestParam(value="state", defaultValue="off") String str) {
 
 		String info = new String();
 
@@ -74,7 +74,7 @@ public class ListenerController {
 				System.out.println("\n " +e);
 			}*/
 			
-			LaunchPrimitive.ListenPrimitive();
+			LaunchPrimitive.listenPrimitive();
 			
 			info = "Waiting state";
 		}
@@ -85,7 +85,7 @@ public class ListenerController {
 		return new Poppy(info);
 	}
 	@RequestMapping("/listen")
-	public Poppy poppy1(@RequestParam(value="state", defaultValue="off") String str) {
+	public Poppy listen(@RequestParam(value="state", defaultValue="off") String str) {
 
 		String info = new String();
 
@@ -109,7 +109,7 @@ public class ListenerController {
 				System.out.println("\n " +e);
 			}
 			
-			LaunchPrimitive.ListenPrimitive();
+			LaunchPrimitive.listenPrimitive();
 			info = "Listening state";
 		}
 		else{
@@ -120,7 +120,7 @@ public class ListenerController {
 	}
 	
 	@RequestMapping("/wait_behave")
-	public Poppy poppy2(@RequestParam(value="state", defaultValue="off") String str) {
+	public Poppy waitBehave(@RequestParam(value="state", defaultValue="off") String str) {
 
 		String info = new String();
 		Random rand = new Random();
@@ -168,7 +168,7 @@ public class ListenerController {
 			LaunchPrimitive.playBehaviorPrimitive(wait_behave_list.get(rand.nextInt(((wait_behave_list.size()-1)+ 1))));
 			LaunchPrimitive.playSpeakPrimitive(wait_text_list.get(rand.nextInt(((wait_behave_list.size()-1)+ 1))));
 			
-			LaunchPrimitive.ListenPrimitive();
+			LaunchPrimitive.listenPrimitive();
 			
 			info = "Listening state";
 		}
@@ -212,11 +212,11 @@ public class ListenerController {
 			info = "Not in a Listening state";
 		}
 		
-		LaunchPrimitive.ListenPrimitive();
+		LaunchPrimitive.listenPrimitive();
 		return new Poppy(info);
 	}
 	@RequestMapping("/wait_behave_manuel")
-	public Poppy poppy3(@RequestParam(value="state", defaultValue="off") String str) {
+	public Poppy waitBehaveManual(@RequestParam(value="state", defaultValue="off") String str) {
 
 		String info = new String();
 		Random rand = new Random();
