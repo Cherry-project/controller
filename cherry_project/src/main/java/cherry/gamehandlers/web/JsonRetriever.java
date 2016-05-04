@@ -6,7 +6,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import cherry.robothandlers.service.LaunchPresentation;
@@ -21,7 +24,8 @@ public class JsonRetriever {
 	 
 	private static Logger logger = Logger.getLogger(JsonRetriever.class);
 	
-	@RequestMapping("/jsonreader")
+	@CrossOrigin
+	@RequestMapping(method = RequestMethod.POST, value = "/{jsonreader}")
 	public Poppy poppy(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		  StringBuffer jb = new StringBuffer();
@@ -39,10 +43,6 @@ public class JsonRetriever {
 		  
 		  System.out.println("\n1		" + jb.toString());
 		  
-		  //Response to Website
-		  /*response.setContentType("text/html");
-		  response.setStatus(HttpServletResponse.SC_OK);
-		  response.getOutputStream();*/
 		  JSONObject my_json = new JSONObject();
 		  
 		  try{

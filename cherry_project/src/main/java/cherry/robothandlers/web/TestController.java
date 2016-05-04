@@ -1,6 +1,7 @@
 package cherry.robothandlers.web;
 
 import org.apache.log4j.Logger;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,7 @@ public class TestController {
     
 	private static Logger logger = Logger.getLogger(TestController.class);
 	
+	@CrossOrigin
 	@RequestMapping("/behave")
 	public Poppy poppy(@RequestParam(value="name") String a_str) 
 	{
