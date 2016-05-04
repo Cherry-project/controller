@@ -1,5 +1,6 @@
 package cherry.robothandlers.web;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,8 +9,12 @@ import cherry.robotpresentateur.service.Robot;
 import cherry.robothandlers.service.Poppy;
 
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,8 +33,6 @@ public class SetupController {
 	@RequestMapping("/setup")
 	public Poppy setupRobot(@RequestParam(value="id", required = false, defaultValue = "null") String name, HttpServletRequest request, HttpServletResponse response) 
 	{		
-			
-		
 			
 			String ip = request.getHeader("X-Forwarded-For");  
 		    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {  
@@ -65,44 +68,72 @@ public class SetupController {
 		    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {  
 		        ip = request.getRemoteAddr();  
 		    }  
-		    //System.out.println("\n Ip Adress: " + ip + " name: " + name);
 		    
 		    logger.info("New Robot: Name: " + name + " Ip adress: " + ip);
 		    
-		    //if (robot_list.size()<2)
-		    //{
-				Robot robot = new Robot();	
-			    robot.setIp(ip);
-			    robot.setName(name);
+		    
+		    // start RobotList update thread
+		    if (robot_list.size() == 0 )
+		    {
+		    	UpdateRobotList update = new UpdateRobotList();
+		    	update.start();
+		    }
+		    
+		    // Create a new Robot instance
+			Robot robot = new Robot();	
+		    robot.setIp(ip);
+		    robot.setName(name);
 			    
-			    robot_list.add(robot);
-			    
+		    boolean robotKnown = false;
+		    
+		    //Check whether the new robot is already in the list
+		    for(Robot robotIdx : robot_list)
+		    {
+		    	// if true, Update IP_adress
+		    	if(name.equals(robotIdx.getName()))
+		    	{
+		    		robotKnown = true;
+		    		logger.warn("Robot " + name + " already exists");
+		    		robotIdx.setIp(ip);
+		    		break;	
+		    	} 	
+		    }
+		    
+		    // If false add it
+		    if (!robotKnown)
+		    {
+			    robot_list.add(robot);   
 			    System.out.println("\n Hello robot: " + name + " !");
 			    
-			    // Set IP to robot
+			    // Set current IP
 			    url_to_robot = robot.getIp();
-			    
-			/*}
-		    else{
-		    	
-		    	System.out.println("\n Already 2 robots defined!");
-		    }*/
-		    
-		    // A la main
-		    robot_list.get(0).setIp("192.168.1.103");
-		    try{
-		    	robot_list.get(1).setIp("192.168.1.104");
-		    }
-		    catch(Exception e){}
+		    }  
+			
 		    
 		    return new Poppy("Id: " + ip + " HTTP REQ: " + request);
 		    
 	    }
+	
+	@CrossOrigin
 	@RequestMapping("/robots")
-	public Poppy availableRobots(@RequestParam(value="id", required = false, defaultValue = "null") String name, HttpServletRequest request, HttpServletResponse response) 
-	{
+	public static void availableRobots(@RequestParam(value="id", required = false, defaultValue = "null") String name, HttpServletRequest request, HttpServletResponse response) 
+	{	
+		// Parse the current robot_list
+		JSONArray mJSONArray = new JSONArray(Arrays.asList(robot_list));
 		
-		return new Poppy("Available robots" + robot_list.toString());
+		// Set response parameters
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.setHeader("Access-Control-Allow-Origin", "*");//cross domain request/CORS
+		
+		
+		// Send a JSON containing the robots
+		try {
+			response.getWriter().write(mJSONArray.toString());
+			//mJSONArray.write(response.getWriter());
+		} catch (IOException e) {
+			System.out.println("\n Error: " + e);
+		}
 		
 	}
 
