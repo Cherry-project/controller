@@ -5,7 +5,6 @@ import org.apache.log4j.Logger;
 
 //import cherry.gamehandlers.service.ToWebsite;
 import cherry.robothandlers.web.SetupController;
-import cherry.robotpresentateur.service.Robot;
 
 public class LaunchPrimitive {
 	
