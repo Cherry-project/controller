@@ -5,12 +5,13 @@ import org.apache.log4j.Logger;
 
 //import cherry.gamehandlers.service.ToWebsite;
 import cherry.robothandlers.web.SetupController;
+import cherry.robotpresentateur.service.Robot;
 
 public class LaunchPrimitive {
 	
 	private static Logger logger = Logger.getLogger(LaunchPrimitive.class);
 	
-	
+	// Method to start "behave" primitives
 	public static void startBehaviorPrimitive(String behavior){
 		
 		try {
@@ -23,6 +24,7 @@ public class LaunchPrimitive {
 
 	}
 	
+	// Method to stop "behave" primitives
 	public static void stopPrimitive(String behavior){
 		
 		try {
@@ -35,6 +37,7 @@ public class LaunchPrimitive {
 
 	}
 	
+	// Method to start "speak" primitive
 	public static void startSpeakPrimitive(String txtString){
 		
 		
@@ -44,12 +47,13 @@ public class LaunchPrimitive {
     	boolean dontWait = false;
     	boolean dontPlay = false;
     	
+    	/* Enable two robots to move speak simultaneously 
     	if(txtString.indexOf("(dontwait)") != -1)
     	{
     		dontWait = true;
     		txtString = txtString.substring(txtString.indexOf(")")+1);
     		
-    	}
+    	}*/
     	
     	if(txtString.trim().isEmpty()){
     		System.out.println("\nEmpty field! The robot wont play");
@@ -68,9 +72,7 @@ public class LaunchPrimitive {
 		}
     
     	// Start Primitive
-
 		try {
-			
 			
 			// Set Parameter to current robot
 			if(dontPlay!=true){
@@ -126,7 +128,7 @@ public class LaunchPrimitive {
 			
 	}	
 	
-	
+	// Start Listen primitive
 	public static void startListenPrimitive(){
 		
     	String property = "listen";
@@ -149,19 +151,9 @@ public class LaunchPrimitive {
 				}
 				catch(Exception e){
 					System.out.println("\nErreur " +e);
-				}
-	    		
-				/////////////////////////////////////////////
+				}	    		
 				
-				/*try {
-					current_primitive = HttpURLConnectionExample.sendGet(url_to_robot + "/primitive/running/list.json");
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}*/
-				
-				current_primitive = LaunchPrimitive.getRunningPrimitiveList();
-	    		////////////////////////////////////////////
+				current_primitive = LaunchPrimitive.getRunningPrimitiveList();	    		
 	    		
 	    		index_speak = current_primitive.indexOf("speak");
 	    		System.out.println("\n			Primitive: " + current_primitive );
@@ -176,6 +168,7 @@ public class LaunchPrimitive {
 		//LaunchPrimitive.playBehaviorPrimitive("listen");
 		
 		try {
+			// Local IP for the moment -> to be changed 
 			HttpConnection.sendGet("http://127.0.0.2:8888" + "/primitive/" + property + "/start.json");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -203,6 +196,7 @@ public class LaunchPrimitive {
     	//ToWebsite.setListeningSignal("off");
 	}
 	
+	// Get all primitives running
 	public static String getRunningPrimitiveList(){
 		
 
@@ -218,6 +212,7 @@ public class LaunchPrimitive {
 		return current_primitive;
 	}
 	
+	// get Listen state of th robot
 	public static String getListenStateParameter(){
 		
 		
@@ -228,6 +223,7 @@ public class LaunchPrimitive {
     	// Start Primitive
 
 		try {
+			// Local IP for the moment -> to be changed 
 			listen_state = HttpConnection.sendGet("http://127.0.0.2:8888" + "/primitive/" + primitive + "/property/" + property);
 		} 
 		catch (Exception e) {
@@ -238,6 +234,7 @@ public class LaunchPrimitive {
   	
 	}
 	
+	// Set Listen state of the robot
 	public static void setListenStateParameter(String txtString){
 		
 		
@@ -249,6 +246,7 @@ public class LaunchPrimitive {
     	// Start Primitive
 
 		try {
+			// Local IP for the moment -> to be changed 
 			HttpConnection.sendPost("http://127.0.0.2:8888" + "/primitive/" + primitive + "/property/" + property +"/value.json", str);
 		} 
 		catch (Exception e) {
@@ -257,6 +255,8 @@ public class LaunchPrimitive {
 		}	
   	
 	}
+	
+	// Specific method to change language spoken by the robot
 	public static void setSpeakLanguage(String langString){
 		
 		
@@ -269,7 +269,6 @@ public class LaunchPrimitive {
     	// Start Primitive
 
 		try {
-			//logger.info("Set Language to : " + langString);
 			HttpConnection.sendPost(SetupController.urlToRobot + "/primitive/" + primitive + "/property/" + property +"/value.json", str);
 		} 
 		catch (Exception e) {
@@ -279,15 +278,14 @@ public class LaunchPrimitive {
   	
 	}
 	
+	// Generic method to set the property "property" of the primitive "primitive" with the value "value"
 	public static void setPrimitiveParameter(String primitive, String property, String value){
 		
     	  	
     	String str = "\"" + value.toLowerCase() + "\"";
     
-    	// Start Primitive
-
 		try {
-			//logger.info("Set Language to : " + langString);
+			
 			HttpConnection.sendPost(SetupController.urlToRobot + "/primitive/" + primitive + "/property/" + property +"/value.json", str);
 		} 
 		catch (Exception e) {
@@ -296,6 +294,8 @@ public class LaunchPrimitive {
 		}	
   	
 	}
+	
+	// Reset the Audio file system on the robot -> all files are deleted
 	public static void resetAudioSystem(){
 		
 		try {
@@ -307,7 +307,9 @@ public class LaunchPrimitive {
 		}
 	}
 	
-	public static void sendMovementToRobot(String string){
+	// Specific method to send a full movement from server
+	// Unused
+	/*public static void sendMovementToRobot(String string){
 		
 
 		String primitive = "play_movement";
@@ -324,9 +326,11 @@ public class LaunchPrimitive {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
-	}
+	}*/
 	
-	public static void playMovement(){
+	// Specific method to start the mvt sent from th server
+	// Unused
+	/*public static void playMovement(){
 		
 	  	
 		String primitive = "play_movement";
@@ -343,7 +347,7 @@ public class LaunchPrimitive {
 			e.printStackTrace();
 		}	
   	
-	}
+	}*/
 	
 
 }
