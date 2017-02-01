@@ -99,8 +99,8 @@ public class TestController {
 				return new Poppy(info);
 			}
 		  
-		    LaunchPrimitive.sendMovementToRobot(myJson.toString());
-		    LaunchPrimitive.playMovement();
+		    //LaunchPrimitive.sendMovementToRobot(myJson.toString());
+		    //LaunchPrimitive.playMovement();
 		  
 		return new Poppy(info); 
 	}
