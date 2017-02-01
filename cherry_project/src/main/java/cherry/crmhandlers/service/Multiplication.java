@@ -57,10 +57,10 @@ public class Multiplication {
 		
 		// text
 		String str = "Combien font " + Integer.toString(m.number_a) + " fois " + Integer.toString(m.number_b) + " ?";
-		LaunchPrimitive.playSpeakPrimitive(str);
+		LaunchPrimitive.startSpeakPrimitive(str);
 		
 		// behavior
-		LaunchPrimitive.playBehaviorPrimitive("question_behave");
+		LaunchPrimitive.startBehaviorPrimitive("question_behave");
 		
 		//Set result
 		m.setResult(m);
@@ -76,14 +76,27 @@ public class Multiplication {
 				
 		// text
 		String str = "Combien font " + Integer.toString(m.number_a) + " fois " + Integer.toString(m.number_b) + " ?";
-		LaunchPrimitive.playSpeakPrimitive(str);
+		LaunchPrimitive.startSpeakPrimitive(str);
 		
 		// behavior
-		LaunchPrimitive.playBehaviorPrimitive("left_arm_up_behave");
+		LaunchPrimitive.startBehaviorPrimitive("left_arm_up_behave");
 		
 		//Set result
 		m.setResult(m);
 		// Mark as done
 		m.setAlready_Done(m.getAlready_Done()+1);	
 	}
-}	
+	public void learnAllMultiplications() {
+		
+			
+		for(int i =1; i<=10; i++)
+		{
+			for (int j = 10 ; j<=10; j++)
+			{
+				// text
+				String str = "Combien font " + Integer.toString(i) + " fois " + Integer.toString(j) + " ?";
+				LaunchPrimitive.startSpeakPrimitive(str);
+			}
+		}
+	}	
+}

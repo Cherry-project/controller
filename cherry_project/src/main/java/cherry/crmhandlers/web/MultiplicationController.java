@@ -16,15 +16,15 @@ public class MultiplicationController {
     
 	// used to set the a single value
 	@RequestMapping("/set")
-	public Poppy poppy(@RequestParam(value="param", required = false, defaultValue = "null") String a_str) {
+	public Poppy setMultiplicationCoefficient(@RequestParam(value="param", required = false, defaultValue = "null") String aStr) {
        
 		String info = new String();
 		
 		// Stop head mvt if activated
-		String current_primitive = LaunchPrimitive.getRunningPrimitiveList();		
-		int index_head = current_primitive.indexOf("head_idle_motion");
+		String currentPrimitive = LaunchPrimitive.getRunningPrimitiveList();		
+		int indexHead = currentPrimitive.indexOf("head_idle_motion");
 		
-		if(index_head != -1){
+		if(indexHead != -1){
 			LaunchPrimitive.stopPrimitive("head_idle_motion");
 		}
 				
@@ -32,16 +32,16 @@ public class MultiplicationController {
 		//LaunchPrimitive.setListenStateParameter("multi");
 		
 		// trigger a random multi
-		if( a_str.equals("null")){
+		if( aStr.equals("null")){
 			multi.playRandomMultiplication(multi);
 			info = "Play Random multiplication";
 
 		}
 		// trigger a multi 
-		else if ( Integer.parseInt(a_str) > 0 || Integer.parseInt(a_str) <= 10){
+		else if ( Integer.parseInt(aStr) > 0 || Integer.parseInt(aStr) <= 10){
 			int b = 8;
 
-			multi.setNumber_a(Integer.parseInt(a_str));
+			multi.setNumber_a(Integer.parseInt(aStr));
 			multi.setNumber_b(b);			
 			multi.playMultiplication(multi);
 			
@@ -56,7 +56,7 @@ public class MultiplicationController {
 		}
 		
 		else{
-			LaunchPrimitive.playSpeakPrimitive("Je ne peux pas faire cette multiplication.");
+			LaunchPrimitive.startSpeakPrimitive("Je ne peux pas faire cette multiplication.");
 			return new Poppy("impossible de faire cette multiplication");
 		}
 		
@@ -67,7 +67,7 @@ public class MultiplicationController {
 	
 	// used to compute the answer
 	@RequestMapping("/answer")
-	public Poppy poppy1(@RequestParam(value="param", defaultValue="Null") int response) {
+	public Poppy answerComputation(@RequestParam(value="param", defaultValue="Null") int response) {
         
 		System.out.println("\n Already done ? : " + multi.getAlready_Done());
 		String info = new String();
@@ -80,8 +80,8 @@ public class MultiplicationController {
 		
 		if ( response ==  multi.getResult())
 		{
-			LaunchPrimitive.playSpeakPrimitive("Tu as donn\u00E9 la bonne r\u00E9ponse!");
-			LaunchPrimitive.playBehaviorPrimitive("rest_open_behave");
+			LaunchPrimitive.startSpeakPrimitive("Tu as donn\u00E9 la bonne r\u00E9ponse!");
+			LaunchPrimitive.startBehaviorPrimitive("rest_open_behave");
 			//System.out.println("\n Tu as bien r\u00E9pondu gamin!");
 			
 			// Reset to 0
@@ -92,7 +92,7 @@ public class MultiplicationController {
 		}
 		else if ( response !=  multi.getResult() && multi.getAlready_Done() == 1)
 		{
-			LaunchPrimitive.playSpeakPrimitive("Aie aie aie;  tu n'as pas donn\u00E9 la bonne r\u00E9ponse!");
+			LaunchPrimitive.startSpeakPrimitive("A\u00efe a\u00efe a\u00efe;  tu n'as pas donn\u00E9 la bonne r\u00E9ponse!");
 			//System.out.println("\n Ce n'est pas la bonne r\u00E9ponse, on l'a refait");
 			multi.playMultiplication(multi);
 
@@ -100,7 +100,7 @@ public class MultiplicationController {
 		}
 		else if ( response !=  multi.getResult() && multi.getAlready_Done() == 2)
 		{
-			LaunchPrimitive.playSpeakPrimitive("Ce n'est toujours pas la bonne r\u00E9ponse, la bonne r\u00E9ponse est " + multi.getResult() );
+			LaunchPrimitive.startSpeakPrimitive("Ce n'est toujours pas la bonne r\u00E9ponse, la bonne r\u00E9ponse est " + multi.getResult() );
 			//System.out.println("\n Deux fois faux, ca fait beaucoup gamin! La r\u00E9ponse est " + multi.getResult());
 			
 			// Reset to 0
@@ -123,8 +123,8 @@ public class MultiplicationController {
 	@RequestMapping("/right_answer")
 	public Poppy rightAnswer(@RequestParam(value="param", defaultValue="Null") int response) {
 		
-		LaunchPrimitive.playSpeakPrimitive("Tu as donn\u00E9 la bonne r\u00E9ponse!");
-		LaunchPrimitive.playBehaviorPrimitive("rest_open_behave");
+		LaunchPrimitive.startSpeakPrimitive("Tu as donn\u00E9 la bonne r\u00E9ponse!");
+		LaunchPrimitive.startBehaviorPrimitive("rest_open_behave");
 		//System.out.println("\n Tu as bien r\u00E9pondu gamin!");
 		
 		// Reset to 0
@@ -137,7 +137,7 @@ public class MultiplicationController {
 	
 		if ( multi.getAlready_Done() == 1)
 		{
-			LaunchPrimitive.playSpeakPrimitive("Aie aie aie;  tu n'as pas donn\u00E9 la bonne r\u00E9ponse!");
+			LaunchPrimitive.startSpeakPrimitive("Aie aie aie;  tu n'as pas donn\u00E9 la bonne r\u00E9ponse!");
 			//System.out.println("\n Ce n'est pas la bonne r\u00E9ponse, on l'a refait");
 			multi.playMultiplication(multi);
 
@@ -145,8 +145,8 @@ public class MultiplicationController {
 		}
 		else if ( multi.getAlready_Done() == 2)
 		{
-			LaunchPrimitive.playSpeakPrimitive("Ce n'est toujours pas la bonne r\u00E9ponse, la bonne r\u00E9ponse est " + multi.getResult() );
-			LaunchPrimitive.playBehaviorPrimitive("rest_open_behave");
+			LaunchPrimitive.startSpeakPrimitive("Ce n'est toujours pas la bonne r\u00E9ponse, la bonne r\u00E9ponse est " + multi.getResult() );
+			LaunchPrimitive.startBehaviorPrimitive("rest_open_behave");
 			//System.out.println("\n Deux fois faux, ca fait beaucoup gamin! La r\u00E9ponse est " + multi.getResult());
 			
 			// Reset to 0
@@ -156,6 +156,15 @@ public class MultiplicationController {
 			//LaunchPrimitive.setListenStateParameter("normal");
 		}
 		return new Poppy("Manual answer");
+	
+	}
+	@RequestMapping("/learn_all_multiplications")
+	public Poppy learnQuestion(@RequestParam(value="param", defaultValue="Null") int response) {
+		
+		multi.learnAllMultiplications();
+		
+		
+		return new Poppy("Learn all questions");
 	
 	}
 }
