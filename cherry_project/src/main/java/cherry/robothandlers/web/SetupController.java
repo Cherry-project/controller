@@ -1,12 +1,14 @@
 package cherry.robothandlers.web;
 
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import cherry.robotpresentateur.service.Robot;
 import cherry.robothandlers.service.Poppy;
+import cherry.robothandlers.service.Robot;
+import cherry.robothandlers.service.UpdateRobotListThread;
 
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
@@ -23,17 +25,19 @@ import javax.servlet.http.HttpServletResponse;
 public class SetupController {
 	
 	private static Logger logger = Logger.getLogger(SetupController.class);
+	private static boolean startUpdateThread = false;
 	
-	public static String url_to_robot = "http://192.168.1.103";
-	public static String url_to_website = "http://192.168.1.200:80";
+	public static String urlToRobot;
+	public static String urlToWebsite = "http://localhost:80";
 	
-	public static ArrayList<Robot> robot_list = new ArrayList<Robot>();
-
-			
+	public static ArrayList<Robot> robotList = new ArrayList<Robot>();
+	
+	
 	@RequestMapping("/setup")
 	public Poppy setupRobot(@RequestParam(value="id", required = false, defaultValue = "null") String name, HttpServletRequest request, HttpServletResponse response) 
 	{		
 			
+			// GET Ip adress
 			String ip = request.getHeader("X-Forwarded-For");  
 		    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {  
 		        ip = request.getHeader("Proxy-Client-IP");  
@@ -71,14 +75,6 @@ public class SetupController {
 		    
 		    logger.info("New Robot: Name: " + name + " Ip adress: " + ip);
 		    
-		    
-		    // start RobotList update thread
-		    if (robot_list.size() == 0 )
-		    {
-		    	UpdateRobotList update = new UpdateRobotList();
-		    	update.start();
-		    }
-		    
 		    // Create a new Robot instance
 			Robot robot = new Robot();	
 		    robot.setIp(ip);
@@ -87,7 +83,7 @@ public class SetupController {
 		    boolean robotKnown = false;
 		    
 		    //Check whether the new robot is already in the list
-		    for(Robot robotIdx : robot_list)
+		    for(Robot robotIdx : robotList)
 		    {
 		    	// if true, Update IP_adress
 		    	if(name.equals(robotIdx.getName()))
@@ -102,14 +98,22 @@ public class SetupController {
 		    // If false add it
 		    if (!robotKnown)
 		    {
-			    robot_list.add(robot);   
+			    robotList.add(robot);   
 			    System.out.println("\n Hello robot: " + name + " !");
 			    
 			    // Set current IP
-			    url_to_robot = robot.getIp();
-		    }  
-			
+			    urlToRobot = robot.getIp();
+		    } 
 		    
+		    // start RobotList update thread
+		    if (!startUpdateThread)
+		    {
+		    	UpdateRobotListThread update = new UpdateRobotListThread();
+		    	update.start();
+		    	startUpdateThread = true;
+		    }
+		    
+		       
 		    return new Poppy("Id: " + ip + " HTTP REQ: " + request);
 		    
 	    }
@@ -119,7 +123,7 @@ public class SetupController {
 	public static void availableRobots(@RequestParam(value="id", required = false, defaultValue = "null") String name, HttpServletRequest request, HttpServletResponse response) 
 	{	
 		// Parse the current robot_list
-		JSONArray mJSONArray = new JSONArray(Arrays.asList(robot_list));
+		JSONArray mJSONArray = new JSONArray(Arrays.asList(robotList));
 		
 		// Set response parameters
 		response.setContentType("application/json");

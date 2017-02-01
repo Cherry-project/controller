@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cherry.gamehandlers.service.ToWebsite;
 import cherry.robothandlers.service.LaunchPrimitive;
 import cherry.robothandlers.service.Poppy;
-import cherry.robothandlers.service.SimpleExcelReaderExample;
+import cherry.robothandlers.service.ExcelReader;
 
 import java.util.Random;
 
@@ -29,7 +29,7 @@ public class ListenerController {
 
 		if( str.equals("on")){
 		
-			LaunchPrimitive.playSpeakPrimitive("Bonjour, je suis reveiller");
+			LaunchPrimitive.startSpeakPrimitive("Bonjour, je suis reveiller");
 			
 			info = "Hello";
 		}
@@ -56,7 +56,7 @@ public class ListenerController {
     		//int index_head = current_primitive.indexOf("head_idle_motion");
     		
     		if(index_torso == -1){
-    			LaunchPrimitive.playBehaviorPrimitive("torso_idle_motion");
+    			LaunchPrimitive.startBehaviorPrimitive("torso_idle_motion");
     		}
     		/*if(index_head == -1){
     			LaunchPrimitive.playBehaviorPrimitive("head_idle_motion");
@@ -74,7 +74,7 @@ public class ListenerController {
 				System.out.println("\n " +e);
 			}*/
 			
-			LaunchPrimitive.listenPrimitive();
+			LaunchPrimitive.startListenPrimitive();
 			
 			info = "Waiting state";
 		}
@@ -109,7 +109,7 @@ public class ListenerController {
 				System.out.println("\n " +e);
 			}
 			
-			LaunchPrimitive.listenPrimitive();
+			LaunchPrimitive.startListenPrimitive();
 			info = "Listening state";
 		}
 		else{
@@ -133,7 +133,7 @@ public class ListenerController {
     		//int index_head = current_primitive.indexOf("head_idle_motion");
     		
     		if(index_torso == -1){
-    			LaunchPrimitive.playBehaviorPrimitive("torso_idle_motion");
+    			LaunchPrimitive.startBehaviorPrimitive("torso_idle_motion");
     		}
     		/*if(index_head == -1){
     			LaunchPrimitive.playBehaviorPrimitive("head_idle_motion");
@@ -145,7 +145,7 @@ public class ListenerController {
 				
 				// Get list of primitive into Excel file
 				try {
-					wait_behave_list = SimpleExcelReaderExample.getExcelField("./Resources/Attente.xlsx","Behave");
+					wait_behave_list = ExcelReader.getExcelField("./Resources/Attente.xlsx","Behave");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -155,7 +155,7 @@ public class ListenerController {
 				
 				// Get list of TTS into Excel file
 				try {
-					wait_text_list = SimpleExcelReaderExample.getExcelField("./Resources/Attente.xlsx","Text");
+					wait_text_list = ExcelReader.getExcelField("./Resources/Attente.xlsx","Text");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -165,10 +165,10 @@ public class ListenerController {
 				
 			}
 			
-			LaunchPrimitive.playBehaviorPrimitive(wait_behave_list.get(rand.nextInt(((wait_behave_list.size()-1)+ 1))));
-			LaunchPrimitive.playSpeakPrimitive(wait_text_list.get(rand.nextInt(((wait_behave_list.size()-1)+ 1))));
+			LaunchPrimitive.startBehaviorPrimitive(wait_behave_list.get(rand.nextInt(((wait_behave_list.size()-1)+ 1))));
+			LaunchPrimitive.startSpeakPrimitive(wait_text_list.get(rand.nextInt(((wait_behave_list.size()-1)+ 1))));
 			
-			LaunchPrimitive.listenPrimitive();
+			LaunchPrimitive.startListenPrimitive();
 			
 			info = "Listening state";
 		}
@@ -212,7 +212,7 @@ public class ListenerController {
 			info = "Not in a Listening state";
 		}
 		
-		LaunchPrimitive.listenPrimitive();
+		LaunchPrimitive.startListenPrimitive();
 		return new Poppy(info);
 	}
 	@RequestMapping("/wait_behave_manuel")
@@ -229,7 +229,7 @@ public class ListenerController {
     		//int index_head = current_primitive.indexOf("head_idle_motion");
     		
     		if(index_torso == -1){
-    			LaunchPrimitive.playBehaviorPrimitive("torso_idle_motion");
+    			LaunchPrimitive.startBehaviorPrimitive("torso_idle_motion");
     		}
     		/*if(index_head == -1){
     			LaunchPrimitive.playBehaviorPrimitive("head_idle_motion");
@@ -242,7 +242,7 @@ public class ListenerController {
 				
 				// Get list of primitive into Excel file
 				try {
-					wait_behave_list = SimpleExcelReaderExample.getExcelField("./Resources/Attente.xlsx","Behave");
+					wait_behave_list = ExcelReader.getExcelField("./Resources/Attente.xlsx","Behave");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -252,7 +252,7 @@ public class ListenerController {
 				
 				// Get list of TTS into Excel file
 				try {
-					wait_text_list = SimpleExcelReaderExample.getExcelField("./Resources/Attente.xlsx","Text");
+					wait_text_list = ExcelReader.getExcelField("./Resources/Attente.xlsx","Text");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -262,8 +262,8 @@ public class ListenerController {
 				
 			}
 			
-			LaunchPrimitive.playBehaviorPrimitive(wait_behave_list.get(rand.nextInt(((wait_behave_list.size()-1)+ 1))));
-			LaunchPrimitive.playSpeakPrimitive(wait_text_list.get(rand.nextInt(((wait_behave_list.size()-1)+ 1))));
+			LaunchPrimitive.startBehaviorPrimitive(wait_behave_list.get(rand.nextInt(((wait_behave_list.size()-1)+ 1))));
+			LaunchPrimitive.startSpeakPrimitive(wait_text_list.get(rand.nextInt(((wait_behave_list.size()-1)+ 1))));
 			
 			
 			info = "Listening state manuel";

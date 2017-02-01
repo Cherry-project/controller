@@ -1,23 +1,21 @@
 package cherry.robothandlers.service;
 
+
 import org.apache.log4j.Logger;
 
-import cherry.gamehandlers.service.ToWebsite;
+//import cherry.gamehandlers.service.ToWebsite;
 import cherry.robothandlers.web.SetupController;
-import cherry.robotpresentateur.service.Robot;
 
 public class LaunchPrimitive {
-	
-	//private static String url_to_robot = SetupController.url_to_robot;
 	
 	private static Logger logger = Logger.getLogger(LaunchPrimitive.class);
 	
 	
-	public static void playBehaviorPrimitive(String behavior){
+	public static void startBehaviorPrimitive(String behavior){
 		
 		try {
 			logger.info("Play Behave Primitive: " + behavior);
-			HttpURLConnectionExample.sendGet(SetupController.url_to_robot + "/primitive/" + behavior + "/start.json");
+			HttpConnection.sendGet(SetupController.urlToRobot + "/primitive/" + behavior + "/start.json");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -29,7 +27,7 @@ public class LaunchPrimitive {
 		
 		try {
 			logger.info("Stop Behave Primitive: " + behavior);
-			HttpURLConnectionExample.sendGet(SetupController.url_to_robot + "/primitive/" + behavior + "/stop.json");
+			HttpConnection.sendGet(SetupController.urlToRobot + "/primitive/" + behavior + "/stop.json");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -37,12 +35,26 @@ public class LaunchPrimitive {
 
 	}
 	
-	public static void playSpeakPrimitive(String txtString){
+	public static void startSpeakPrimitive(String txtString){
 		
 		
 		String primitive = "speak";
     	String property = "sentence_to_speak";
-    	String current_url_to_robot = SetupController.url_to_robot;
+    	String currentUrlToRobot = SetupController.urlToRobot;
+    	boolean dontWait = false;
+    	boolean dontPlay = false;
+    	
+    	if(txtString.indexOf("(dontwait)") != -1)
+    	{
+    		dontWait = true;
+    		txtString = txtString.substring(txtString.indexOf(")")+1);
+    		
+    	}
+    	
+    	if(txtString.trim().isEmpty()){
+    		System.out.println("\nEmpty field! The robot wont play");
+    		dontPlay =true;
+    	}
     	//int index_speak;
     	
     	String str = "\"" + txtString + "\"";
@@ -58,38 +70,24 @@ public class LaunchPrimitive {
     	// Start Primitive
 
 		try {
-			logger.info("Play Speak Primitive with parameter" + str);
+			
 			
 			// Set Parameter to current robot
-			HttpURLConnectionExample.sendPost(current_url_to_robot + "/primitive/" + primitive + "/property/" + property +"/value.json", str);
-			
-			/*do {
-				try{
-					Thread.sleep(100);
-				}
-				catch(Exception e){
-					System.out.println("\nErreur " + e);
-				}
-	    		
-				/////////////////////////////////////////////			
-				String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
-	    		////////////////////////////////////////////
-	    		
-	    		index_speak = current_primitive.indexOf("speak");
-	    		System.out.println("\n			Primitive: " + current_primitive );
-	    		System.out.println("\n			Wait for speak to stop... ");
-	    	}
-	    	while( index_speak != -1 );*/
-			
+			if(dontPlay!=true){
+				logger.info("Play Speak Primitive with parameter" + str);
+				HttpConnection.sendPost(currentUrlToRobot + "/primitive/" + primitive + "/property/" + property +"/value.json", str);
+			}
 			// Wait for all robots to stop speaking
-			waitForSpeakToStop();			
-			
+			if(dontWait != true){
+				waitForSpeakToStop();			
+			}
 			// Back to current robot
-			SetupController.url_to_robot = current_url_to_robot;
+			SetupController.urlToRobot = currentUrlToRobot;
 			
 			// Start speak
-			HttpURLConnectionExample.sendGet(current_url_to_robot + "/primitive/" + primitive + "/start.json");
-		
+			if(dontPlay!=true){
+				HttpConnection.sendGet(currentUrlToRobot + "/primitive/" + primitive + "/start.json");
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -101,44 +99,35 @@ public class LaunchPrimitive {
 	public static void waitForSpeakToStop(){
 		
 		int index_speak;
-		System.out.println("\nLaunchPresentation" + LaunchPresentation.robots_used);
-		for(Robot robot : SetupController.robot_list){
-			
-			for(String robot_str : LaunchPresentation.robots_used){
-				
-			
-				if (robot.getName().equals(robot_str))
-				{
-					System.out.println("\nWaiting for robot " + robot_str + "to stop speaking");
-					SetupController.url_to_robot= robot.getIp().toString();
-					
-					do {
-						try{
-							Thread.sleep(100);
-						}
-						catch(Exception e){
-							System.out.println("\nErreur " + e);
-						}
-			    		
-						
-						/////////////////////////////////////////////			
-						String current_primitive = getRunningPrimitiveList();
-			    		////////////////////////////////////////////
-			    		
-			    		index_speak = current_primitive.indexOf("speak");
 
-			    	}
-			    	while( index_speak != -1 );
-					System.out.println("\nRobot " + robot_str + " stopped");
-				}
+		for(Robot robot : LaunchPresentation.robotsUsed){
 			
+				System.out.println("\nWaiting for robot " + robot.getName() + " to stop speaking");
+				SetupController.urlToRobot= robot.getIp().toString();
+				
+				do {
+					try{
+						Thread.sleep(100);
+					}
+					catch(Exception e){
+						System.out.println("\nErreur " + e);
+					}
+
+					/////////////////////////////////////////////			
+					String current_primitive = getRunningPrimitiveList();
+		    		////////////////////////////////////////////
+		    		
+		    		index_speak = current_primitive.indexOf("speak");
+
+		    	}
+		    	while( index_speak != -1 );
+				System.out.println("\nRobot " + robot.getName() + " stopped");
 			}
-		}
-		
-		
-	}
+			
+	}	
 	
-	public static void listenPrimitive(){
+	
+	public static void startListenPrimitive(){
 		
     	String property = "listen";
     	
@@ -156,7 +145,7 @@ public class LaunchPrimitive {
 		if(is_state == -1){
 			do {
 				try{
-					Thread.sleep(1000);
+					Thread.sleep(500);
 				}
 				catch(Exception e){
 					System.out.println("\nErreur " +e);
@@ -183,11 +172,11 @@ public class LaunchPrimitive {
 		// Start Primitive
 		//LaunchPrimitive.playSpeakPrimitive("Maintenant tu peux me parler");
 		System.out.println("\n Parle!");
-		ToWebsite.setListeningSignal("on");
+		//ToWebsite.setListeningSignal("on");
 		//LaunchPrimitive.playBehaviorPrimitive("listen");
 		
 		try {
-			HttpURLConnectionExample.sendGet("http://127.0.0.2:8888" + "/primitive/" + property + "/start.json");
+			HttpConnection.sendGet("http://127.0.0.2:8888" + "/primitive/" + property + "/start.json");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -196,7 +185,7 @@ public class LaunchPrimitive {
 		// wait until listen is finished
 		do {
 			try{
-				Thread.sleep(1000);
+				Thread.sleep(500);
 			}
 			catch(Exception e){
 				System.out.println("\nErreur " +e);
@@ -211,7 +200,7 @@ public class LaunchPrimitive {
 		}
 		
     	System.out.println("\n Listen finished");
-    	ToWebsite.setListeningSignal("off");
+    	//ToWebsite.setListeningSignal("off");
 	}
 	
 	public static String getRunningPrimitiveList(){
@@ -220,7 +209,7 @@ public class LaunchPrimitive {
     	// Start Primitive
     	String current_primitive  = new String();
 		try {
-			current_primitive = HttpURLConnectionExample.sendGet(SetupController.url_to_robot + "/primitive/running/list.json");
+			current_primitive = HttpConnection.sendGet(SetupController.urlToRobot + "/primitive/running/list.json");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -239,7 +228,7 @@ public class LaunchPrimitive {
     	// Start Primitive
 
 		try {
-			listen_state = HttpURLConnectionExample.sendGet("http://127.0.0.2:8888" + "/primitive/" + primitive + "/property/" + property);
+			listen_state = HttpConnection.sendGet("http://127.0.0.2:8888" + "/primitive/" + primitive + "/property/" + property);
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -260,7 +249,7 @@ public class LaunchPrimitive {
     	// Start Primitive
 
 		try {
-			HttpURLConnectionExample.sendPost("http://127.0.0.2:8888" + "/primitive/" + primitive + "/property/" + property +"/value.json", str);
+			HttpConnection.sendPost("http://127.0.0.2:8888" + "/primitive/" + primitive + "/property/" + property +"/value.json", str);
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -268,6 +257,93 @@ public class LaunchPrimitive {
 		}	
   	
 	}
+	public static void setSpeakLanguage(String langString){
+		
+		
+		String primitive = "speak";
+    	String property = "language";
+    	
+    	
+    	String str = "\"" + langString.toLowerCase() + "\"";
+    
+    	// Start Primitive
 
+		try {
+			//logger.info("Set Language to : " + langString);
+			HttpConnection.sendPost(SetupController.urlToRobot + "/primitive/" + primitive + "/property/" + property +"/value.json", str);
+		} 
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+  	
+	}
+	
+	public static void setPrimitiveParameter(String primitive, String property, String value){
+		
+    	  	
+    	String str = "\"" + value.toLowerCase() + "\"";
+    
+    	// Start Primitive
+
+		try {
+			//logger.info("Set Language to : " + langString);
+			HttpConnection.sendPost(SetupController.urlToRobot + "/primitive/" + primitive + "/property/" + property +"/value.json", str);
+		} 
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+  	
+	}
+	public static void resetAudioSystem(){
+		
+		try {
+			logger.info("Reset Audio System");
+			HttpConnection.sendGet(SetupController.urlToRobot + "/primitive/" + "reset_audio" + "/start.json");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public static void sendMovementToRobot(String string){
+		
+
+		String primitive = "play_movement";
+    	String property = "movement";
+    	
+    	String str = string ;
+    
+    	// Start Primitive
+
+		try {
+			HttpConnection.sendPost("http://127.0.0.2:8888" + "/primitive/" + primitive + "/property/" + property +"/value.json", str);
+		} 
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+	}
+	
+	public static void playMovement(){
+		
+	  	
+		String primitive = "play_movement";
+    	
+    
+    	// Start Primitive
+
+		try {
+			//logger.info("Set Language to : " + langString);
+			HttpConnection.sendGet("http://127.0.0.2:8888" + "/primitive/" + primitive + "/start.json");
+		} 
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+  	
+	}
+	
 
 }

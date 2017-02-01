@@ -16,12 +16,15 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'spring-boot'
 
+
 compileJava { 
   options.encoding = "UTF-8" 
 }
 
+
+
 jar {
-    baseName = 'gs-rest-service'
+    baseName = 'cherry-rest-service'
     version =  '0.1.0'
 }
 
@@ -43,6 +46,9 @@ dependencies {
 	compile files('libs/xmlbeans-2.6.0.jar')
 	compile files('libs/javax.servlet-3.0.jar')
 	compile files('libs/servlet-api.jar')
+	compile files('libs/log4j-1.2.17.jar')
+	compile files('libs/aws-java-sdk-1.10.57.jar')
+	compile files('libs/httpclient-4.5.2.jar')
     testCompile("junit:junit")	 
 
     
@@ -51,4 +57,9 @@ dependencies {
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
+}
+dependencyManagement {
+    imports {
+        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.10.47'
+    }
 }
