@@ -1,25 +1,43 @@
 package cherry.robothandlers.web;
 
+
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import cherry.robothandlers.web.PoppyController;
 import cherry.robothandlers.service.Poppy;
+import cherry.robothandlers.service.Robot;
+import cherry.robothandlers.service.UpdateRobotListThread;
 
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
+
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping("/setup")
 public class SetupController {
 	
 	private static Logger logger = Logger.getLogger(SetupController.class);
+	private static boolean startUpdateThread = false;
 	
-	@RequestMapping("/ip")
-	public Poppy poppy(@RequestParam(value="param", required = false, defaultValue = "null") String a_str, HttpServletRequest request, HttpServletResponse response) 
-	{
+	public static String urlToRobot;
+	public static String urlToWebsite = "http://localhost:80";
+	
+	public static ArrayList<Robot> robotList = new ArrayList<Robot>();
+	
+	
+	@RequestMapping("/setup")
+	public Poppy setupRobot(@RequestParam(value="id", required = false, defaultValue = "null") String name, HttpServletRequest request, HttpServletResponse response) 
+	{		
+			
+			// GET Ip adress
 			String ip = request.getHeader("X-Forwarded-For");  
 		    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {  
 		        ip = request.getHeader("Proxy-Client-IP");  
@@ -54,68 +72,74 @@ public class SetupController {
 		    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {  
 		        ip = request.getRemoteAddr();  
 		    }  
-		    System.out.println("\n Ip Adress: " + ip);
 		    
-		    PoppyController.url_to_robot = "http://" + ip + ":8080";
+		    logger.info("New Robot: Name: " + name + " Ip adress: " + ip);
 		    
-		    logger.info("Get robot IP Adress :" + PoppyController.url_to_robot);
+		    // Create a new Robot instance
+			Robot robot = new Robot();	
+		    robot.setIp(ip);
+		    robot.setName(name);
+			    
+		    boolean robotKnown = false;
 		    
-		    /*String str = "été";
-		    
-		    byte[] bytes = str.getBytes(Charset.forName("UTF-8"));
-		    System.out.println("\n Encode: " + bytes.toString());
-		    
-		    String str_2 = new String(bytes,StandardCharsets.UTF_8);
-		    System.out.println("\n Decode: " + str_2);
-		    LaunchPrimitive.playSpeakPrimitive(str_2);	
-		    
-		    String str_3 = new String(bytes,StandardCharsets.US_ASCII);
-		    System.out.println("\n Decode: " + str_3);
-		    LaunchPrimitive.playSpeakPrimitive(str_3);*/	
-		    
-		    try{
-		    	Thread.sleep(5000);
-		    }
-		    catch(InterruptedException e)
+		    //Check whether the new robot is already in the list
+		    for(Robot robotIdx : robotList)
 		    {
-		    	logger.warn("Can't wait with Thread.sleep", e);	
+		    	// if true, Update IP_adress
+		    	if(name.equals(robotIdx.getName()))
+		    	{
+		    		robotKnown = true;
+		    		logger.warn("Robot " + name + " already exists");
+		    		robotIdx.setIp(ip);
+		    		break;	
+		    	} 	
 		    }
 		    
-		    //logger.info("Logger root: " + LogManager.getLoggerRepository());
+		    // If false add it
+		    if (!robotKnown)
+		    {
+			    robotList.add(robot);   
+			    System.out.println("\n Hello robot: " + name + " !");
+			    
+			    // Set current IP
+			    urlToRobot = robot.getIp();
+		    } 
 		    
-		    //LaunchPrimitive.playSpeakPrimitive("Je suis reveiller!");
+		    // start RobotList update thread
+		    if (!startUpdateThread)
+		    {
+		    	UpdateRobotListThread update = new UpdateRobotListThread();
+		    	update.start();
+		    	startUpdateThread = true;
+		    }
 		    
-			
-		    //Session sess = 
-
-		    
-		    //session.setAttribute("success" , "successfully accessed");
-		    //System.out.println("\n Attribut: " +  session.getAttribute("success"));
-		    
-		    //System.out.println("\n Id: " +  session.getId());
-		    //System.out.println("\n Servlet Context: " +  session.getServletContext());
-		    //System.out.println("\n New session ? " + session.isNew());
-		    //System.out.println("\n Remotehost" + request.getRemoteHost());
-		    
+		       
 		    return new Poppy("Id: " + ip + " HTTP REQ: " + request);
 		    
 	    }
 	
-	/*@RequestMapping(value = "/test", method = RequestMethod.POST)
-	@ResponseBody
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Poppy poppy1
-	         (@RequestBody String jsonReqString ,HttpServletRequest request) 
-	{
-	  //HttpSession session = request.getSession();
-	  //session.setAttribute("success" , "successfully accessed");
-	  
-	  System.out.println("\n Json received" + jsonReqString);
-	  
-	  //session.getAttribute("success");
-	  
-	  return new Poppy("JSON REQ: " + jsonReqString );
-	 
-	}*/
+	@CrossOrigin
+	@RequestMapping("/robots")
+	public static void availableRobots(@RequestParam(value="id", required = false, defaultValue = "null") String name, HttpServletRequest request, HttpServletResponse response) 
+	{	
+		// Parse the current robot_list
+		JSONArray mJSONArray = new JSONArray(Arrays.asList(robotList));
+		
+		// Set response parameters
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.setHeader("Access-Control-Allow-Origin", "*");//cross domain request/CORS
+		
+		
+		// Send a JSON containing the robots
+		try {
+			response.getWriter().write(mJSONArray.toString());
+			//mJSONArray.write(response.getWriter());
+		} catch (IOException e) {
+			System.out.println("\n Error: " + e);
+		}
+		
+	}
+
 		
 }

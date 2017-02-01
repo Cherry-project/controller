@@ -2,19 +2,32 @@ package cherry.robothandlers.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import cherry.gamehandlers.service.ToWebsite;
+import cherry.robothandlers.web.SetupController;;
 
 public class LaunchPresentation {
-
-	//private static String url_to_website= PoppyController.url_to_website;
-	private static int stop = 0; 
-	public static void start( String excelFilePath) throws InterruptedException, IOException {
+	
+	// Status 
+	public static boolean isPresentationRunning = false;
+	private static boolean stop = false;
+	private static boolean enablePicture =false; 
+	
+	private static ArrayList<Robot> robotList = SetupController.robotList;
+	public static  ArrayList<Robot> robotsUsed = new ArrayList<Robot>(); 
+	
+	public static void playFromExcel( String excelFilePath) throws InterruptedException, IOException {
 		
+		enablePicture =false;
+		String pathToWS = new String();
 		// Listen signal "off"
-		ToWebsite.setListeningSignal("off");
+		//ToWebsite.setListeningSignal("off");
+		//isPresentationRunning = true;
 		
 		// Go into presentation state => enable stop while speaking
 		//LaunchPrimitive.setListenStateParameter("presentation");
@@ -38,78 +51,142 @@ public class LaunchPresentation {
 		
 		
 		// Declare Arrays
-		ArrayList<String> list = new ArrayList<String>();
-		ArrayList<String> list_text = new ArrayList<String>();
-		ArrayList<String> list_img = new ArrayList<String>();
+		ArrayList<String> listBehave = new ArrayList<String>();
+		ArrayList<String> listText = new ArrayList<String>();
+		ArrayList<String> listImg = new ArrayList<String>();
+		ArrayList<String> listRobot = new ArrayList<String>();
+		ArrayList<String> listLanguage = new ArrayList<String>();
 		
 		// Get list of primitive into Excel file
 		try {
-			list = SimpleExcelReaderExample.getExcelField(excelFilePath,"Behave");
+			listBehave = ExcelReader.getExcelField(excelFilePath,"Behave");
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		list.add(0,"Start");
-		System.out.println("\nList of " + "Behave: " + list );
+		listBehave.add(0,"Start");
+		System.out.println("\nList of " + "Behave: " + listBehave );
 		
 		// Get list of TTS into Excel file
 		try {
-			list_text = SimpleExcelReaderExample.getExcelField(excelFilePath,"Text");
+			listText = ExcelReader.getExcelField(excelFilePath,"Text");
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		list_text.add(0,"Start");
-		System.out.println("\nList of " + "Text: " + list_text );
+		listText.add(0,"Start");
+		System.out.println("\nList of " + "Text: " + listText );
 		
 		//Get list of picture to display
 		try {
-			list_img = SimpleExcelReaderExample.getExcelField(excelFilePath,"Slide");
+			listImg = ExcelReader.getExcelField(excelFilePath,"Slide");
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		list_img.add(0,"Start");
-		System.out.println("\nList of " + "diapo: " + list_img );
+		listImg.add(0,"Start");
+		System.out.println("\nList of " + "diapo: " + listImg );
 		
-		play(list,list_text,list_img);
+		//Get list of picture to display
+		try {
+			listRobot= ExcelReader.getExcelField(excelFilePath,"Robot");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		listRobot.add(0,"Start");
+		System.out.println("\nList of " + "diapo: " + listRobot );
+		
+		//Get list of language to display
+		try {
+			listLanguage= ExcelReader.getExcelField(excelFilePath,"Language");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		listLanguage.add(0,"Start");
+		System.out.println("\nList of " + "language: " + listLanguage );
+		
+		play(listBehave, listText, listImg, listRobot, listLanguage, pathToWS);
 	}
 	
-	public static void playFromJson(JSONObject my_json) throws InterruptedException, IOException {
-	
-		int step_nb = my_json.length();
-		System.out.println("\n Nombre d'etapes: " + step_nb);
+	public static void playFromJson(JSONObject myJson) throws InterruptedException, IOException {
+
+		// Disable picture display
+		enablePicture =false;
+		robotsUsed.clear();
+		
+		String pathToWS = new String();
+			
+		int stepNb = myJson.length();
+		
+				
 		
 		// Declare Arrays
-		ArrayList<String> list = new ArrayList<String>();
-		list.add(0,"Start");
-		ArrayList<String> list_text = new ArrayList<String>();
-		list_text.add(0,"Start");
-		ArrayList<String> list_img = new ArrayList<String>();
-		list_img.add(0,"Start");
+		ArrayList<String> listBehave = new ArrayList<String>();
+		listBehave.add(0,"Start");
+		ArrayList<String> listText = new ArrayList<String>();
+		listText.add(0,"Start");
+		ArrayList<String> listImg = new ArrayList<String>();
+		listImg.add(0,"Start");
+		ArrayList<String> listRobot= new ArrayList<String>();
+		listRobot.add(0,"Start");
+		ArrayList<String> listLanguage= new ArrayList<String>();
+		listLanguage.add(0,"Start");
 		
-		for(int i = 0; i < step_nb; i++ ) 
+		// try to retrieve the Path To WS for display picture
+		try{
+			pathToWS = (String) myJson.get("Path_to_WS");
+			System.out.println("\n Picture displayed at " + pathToWS);
+			
+			stepNb = stepNb -1;
+			enablePicture = true;
+		}
+		catch( JSONException e)
 		{
-			JSONObject loop_json = my_json.getJSONObject("_" + Integer.toString(i));
-			System.out.println("\n" + loop_json.toString() );
-			
-			
-			String behave = loop_json.getString("Behave"); 
-			String text = loop_json.getString("Text"); 
-			String slide = loop_json.getString("Slide"); 
-			
-			list.add(behave.trim());
-			list_text.add(text);
-			list_img.add(slide.trim());
-			
+			System.out.println("\n No image display");
 		}
 		
-		System.out.println("\n Behave: " + list);
-		System.out.println("\n Text: " + list_text);
-		System.out.println("\n Slide: " + list_img);
-	
+		System.out.println("\n Nombre d'etapes: " + (stepNb));
+		
+		for(int i = 0; i < stepNb; i++ ) 
+		{
+			JSONObject loopJson = myJson.getJSONObject("_" + Integer.toString(i));
+			System.out.println("\n" + loopJson.toString() );
+			
+			
+			String behave = loopJson.getString("Behave"); 
+			String text = loopJson.getString("Text"); 
+			String slide = loopJson.getString("Slide");
+			String robot= loopJson.getString("Robot"); 
+			String language= loopJson.getString("Language");
+			
+			listBehave.add(behave.trim());
+			listText.add(text);
+			listImg.add(slide.trim());
+			listRobot.add(robot.trim());
+			listLanguage.add(language.trim());
+		}
+		
+		Set<String> uniqueRobotList = new HashSet<String>(listRobot);
+		uniqueRobotList.remove("Start");
+		
+		System.out.println("\n Behave: " + listBehave);
+		System.out.println("\n Text: " + listText);
+		System.out.println("\n Slide: " + listImg);
+		System.out.println("\n Robot: " + listRobot);
+		System.out.println("\n Language: " + listLanguage);
+		
+		
+		// Define Used Robot list from Available Robot list
+		for( String element : uniqueRobotList)
+		{	
+			for (Robot robot : robotList)
+			{
+				if (robot.getName().equals(element))
+				{
+					robotsUsed.add(robot);
+				}
+			}
+		}
+		
 		try{
-			play(list, list_text, list_img);
+			play(listBehave, listText, listImg, listRobot, listLanguage, pathToWS);
 		}
 		catch(Exception e)
 		{
@@ -119,119 +196,139 @@ public class LaunchPresentation {
 	
 	}
 		// Play presentation
-	public static void play(ArrayList<String> list, ArrayList<String> list_text, ArrayList<String> list_img ) throws InterruptedException, IOException {
+	public static void play(ArrayList<String> listBehave, ArrayList<String> listText, ArrayList<String> listImg, ArrayList<String> listRobot, ArrayList<String> listLanguage, String pathToWS ) throws InterruptedException, IOException {
 		
-		int index_behave = -1;
-		int index_speak = -1;
-		int index_img = -1;
+		isPresentationRunning = true;
+		
+		
+		// Make them move
+		makeRobotMove();
+		
+		// Set indexes
+		int indexBehave = -1;
+		int indexSpeak = -1;
+		int indexImg = -1;
+		
 		
 		// Stop head, start torso if not done
-		String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
+		//String currentPrimitive = LaunchPrimitive.getRunningPrimitiveList();
 		
-		int index_torso = current_primitive.indexOf("torso_idle_motion");
-		int index_head = current_primitive.indexOf("head_idle_motion");
 		
-		if(index_torso == -1){
-			LaunchPrimitive.playBehaviorPrimitive("torso_idle_motion");
-		}
-		if(index_head != -1){
-			LaunchPrimitive.stopPrimitive("head_idle_motion");
-		}
-		
-		for(int i=1; i< list.size(); i++){
+		//Play presentation
+		for(int i=1; i< listBehave.size(); i++){
 			
-			if (stop == 1){
-				LaunchPrimitive.playSpeakPrimitive("D'accord, j'arr\u00eate la pr\u00e9sentation");
-				LaunchPrimitive.playBehaviorPrimitive("rest_open_behave");
-				stop = 0;
+			// In case of stop
+			if (stop){
+				LaunchPrimitive.startSpeakPrimitive("D'accord, j'arr\u00eate la pr\u00e9sentation");	
+				stop = false;
 				break;
 			}
-			// Check currently running primitive
-			 
-			current_primitive = LaunchPrimitive.getRunningPrimitiveList();
-			System.out.println("\nStr " + current_primitive );
 			
-			index_behave = current_primitive.indexOf(list.get(i-1));
-			index_speak = current_primitive.indexOf("speak");
+			// Check currently running primitive		 
+			String currentPrimitive = LaunchPrimitive.getRunningPrimitiveList();
+			System.out.println("\nStr " + currentPrimitive );
 			
-			System.out.println("\nIndex: " + index_behave +"of :" + list.get(i-1) + " speak: " + index_speak);
+			indexBehave = currentPrimitive.indexOf(listBehave.get(i-1));
+			indexSpeak = currentPrimitive.indexOf("speak");
+			
+			System.out.println("\nIndex: " + indexBehave +"of :" + listBehave.get(i-1) + " speak: " + indexSpeak);
 			
 			// Check wether speak or behave are still running
-			//while( index_speak != -1 && index_behave != -1)
-			while(index_behave != -1)
+			while(indexBehave != -1 && listText.get(i).indexOf("(dontwait)") == -1)
 			{
-				Thread.sleep(1000);
+				Thread.sleep(500);
 				
-				System.out.println("\n			Wainting for " + list.get(i-1) + " to stop" );
+				System.out.println("\n			Wainting for " + listBehave.get(i-1) + " to stop" );
 				
-				current_primitive = LaunchPrimitive.getRunningPrimitiveList();
-				System.out.println("\n			Str " + current_primitive );
+				currentPrimitive = LaunchPrimitive.getRunningPrimitiveList();
+				System.out.println("\n			Str " + currentPrimitive );
 				
-				index_behave = current_primitive.indexOf(list.get(i-1));
-    			index_speak = current_primitive.indexOf("speak");
+				indexBehave = currentPrimitive.indexOf(listBehave.get(i-1));
+    			indexSpeak = currentPrimitive.indexOf("speak");
 				
-    			System.out.println("\n			Index: " + index_behave +" of behave: " + list.get(i-1) + " of speak: " + index_speak);
+    			System.out.println("\n			Index: " + indexBehave +" of behave: " + listBehave.get(i-1) + " of speak: " + indexSpeak);
     			
 			}
 			
-			// Picture			
-			if ( !list_img.get(i).equals(list_img.get(i-1)))
+			// Display picture if allowed		
+			if ( !listImg.get(i).equals(listImg.get(i-1)) && enablePicture)
 			{	
-				System.out.println("\n Old: " + list_img.get(i-1) + " New: " + list_img.get(i));
-				// Shut down previous img (exept "start)
-  				if (list_img.get(i-1) != "Start"){
+				System.out.println("\n Old: " + listImg.get(i-1) + " New: " + listImg.get(i));
+				
+				// Shut down previous img (except "start)
+  				if (listImg.get(i-1) != "Start"){
 					
-  					ToWebsite.deletePicture(list_img.get(i-1));
-  					/*try {
-						HttpURLConnectionExample.sendGet( url_to_website + "/PhpProject_test/WS_video.php?name=" + list_img.get(i-1) + "&owner=admin_off");
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						System.out.println("\n Erreur" + e);
-						e.printStackTrace();
-					}*/
+  					ToWebsite.deletePicture(pathToWS, listImg.get(i-1));
+
 				}
 				// set the new one
-  				index_img = i;
-  				ToWebsite.displayPicture(list_img.get(index_img));
+  				indexImg = i;
+  				ToWebsite.displayPicture(pathToWS, listImg.get(indexImg));
   				
-  				/*try {
-					
-					HttpURLConnectionExample.sendGet(url_to_website + "/PhpProject_test/WS_video.php?name=" + list_img.get(index_img));
-					System.out.println("\n" + url_to_website + "/PhpProject_test/WS_video.php?name=" + list_img.get(index_img));
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					System.out.println("\n Erreur" + e);
-					e.printStackTrace();
-				}*/
 				Thread.sleep(1000);
+			}
 
+			
+			// Get appropriate IP
+			for(Robot robot : robotsUsed){
+				
+				System.out.println("\n Current Name"+ robot.getName() + " : " + robot.getIp() + "Name in JSON: " + listRobot.get(i).toString());
+				
+				if (robot.getName().equals(listRobot.get(i).toString()))
+				{
+					SetupController.urlToRobot= robot.getIp().toString();
+					System.out.println("\n Set New IP to robot "+ robot.getName() + " : " + robot.getIp());
+					break;
+				}
 			}
 			
-			LaunchPrimitive.playSpeakPrimitive(list_text.get(i));
-			System.out.println("\n Speak: " + list_text.get(i));
-			
-			// behavior
-			LaunchPrimitive.playBehaviorPrimitive(list.get(i));
-			System.out.println("\n Play behavior: " + list.get(i));
+			//Set language if defined
+			if(!listLanguage.get(i).isEmpty()){
 				
+				LaunchPrimitive.setSpeakLanguage(listLanguage.get(i));
+				System.out.println("\n Set language to " + listLanguage.get(i));
+			}
+			
+			// Speak
+			if(!listText.get(i).trim().isEmpty()){
+				LaunchPrimitive.startSpeakPrimitive(listText.get(i));
+				System.out.println("\n Speak: " + listText.get(i));
+			}
+			
+			// Behavior if not wait
+			if (listBehave.get(i).indexOf("wait") == -1)
+			{
+				LaunchPrimitive.startBehaviorPrimitive(listBehave.get(i));
+				System.out.println("\n Play behavior: " + listBehave.get(i));
+			}
+			//if wait, get time to wait
+			else 
+			{	
+				int timeToWait = 0 ;
+				
+				try{
+					timeToWait = Integer.parseInt(listBehave.get(i).substring(listBehave.get(i).indexOf("(")+1, listBehave.get(i).indexOf(")")));
+				} catch (NumberFormatException nfe) {
+					System.out.println("Not an Integer!" );
+				}
+				
+				System.out.println("I wait " + Integer.toString(timeToWait) + "s");
+				Thread.sleep(timeToWait*1000);
+
+			}
 			
 		}
 		
 		Thread.sleep(4000);
 		// Kill the last diapo
-		ToWebsite.deletePicture(list_img.get(index_img));
+		if(enablePicture)
+		{
+			ToWebsite.deletePicture(pathToWS, listImg.get(indexImg));
+		}
 		
-		/*
-		 try {
-			HttpURLConnectionExample.sendGet(url_to_website + "/WS_video.php?name="  + list_img.get(index_img) +"&owner=admin_off");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			System.out.println("\n Erreur" + e);
-			e.printStackTrace();
-		}	// TODO Auto-generated method stub
-		*/
-		LaunchPrimitive.stopPrimitive("torso_idle_motion");
-		System.out.println("\n Stop behavior: " + "torso_idle_motion");
+		// Stop all the robots engaged
+		makeRobotStop();
+		
 		
 		// check listen state
     	//String listen_state = LaunchPrimitive.getListenStateParameter();
@@ -243,16 +340,61 @@ public class LaunchPresentation {
     	//	LaunchPrimitive.setListenStateParameter("normal");
     	//}
 		// Set stop to 0
-		stop = 0;
+		stop = false;	
+		isPresentationRunning = false;
 		
 		// Back to listen
 		//LaunchPrimitive.ListenPrimitive();*/
 
 	}
+	public static void makeRobotMove(){
+	//MAKE ROBOT MOVE
+		
+	// for each robot of available robot list
+	for(Robot robot : robotsUsed){
+		
+			SetupController.urlToRobot= robot.getIp().toString();
+			
+			String current_primitive = LaunchPrimitive.getRunningPrimitiveList();
+			
+			int indexTorso = current_primitive.indexOf("torso_idle_motion");
+			int indexHead = current_primitive.indexOf("head_idle_motion");
+			
+			if(indexTorso == -1){
+				LaunchPrimitive.startBehaviorPrimitive("torso_idle_motion");
+			}
+			if(indexHead != -1){
+				LaunchPrimitive.stopPrimitive("head_idle_motion");
+			}
+		}
+		
+	}
+	
+	public static void makeRobotStop(){
+	// STOP ALL ROBOTS
+		
+	for(Robot robot  : robotsUsed){
+			
+			SetupController.urlToRobot= robot.getIp().toString();
+			System.out.println("\n I stop "+ robot.getName());
+			
+			LaunchPrimitive.startBehaviorPrimitive("rest_open_behave");
+			LaunchPrimitive.stopPrimitive("torso_idle_motion");
+		}
+	
+	}
+
+	
 	public static void stop() throws InterruptedException, IOException {
 		
-		stop = 1;
-		System.out.println("\n Set stop to 1");
+		if(isPresentationRunning){
+			stop = true;
+			System.out.println("\n Set stop to \"true\"");
+		}
+		else
+		{
+			System.out.println("\n No presentation running");
+		}
 		//LaunchPrimitive.setListenStateParameter("normal");
 		
 	}
